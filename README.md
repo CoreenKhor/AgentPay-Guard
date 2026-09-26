@@ -43,40 +43,46 @@ Current agent wallet integrations rely on standard programmatic keypairs or unco
 
 AgentPay Guard implements a **four-layer verification protocol** designed to execute in parallel with agent reasoning cycles, validating state transitions prior to transaction assembly and signature.
 
+![AgentPay Guard Protocol Architecture](./assets/diagrams/protocol_architecture.svg)
+
+<details>
+<summary><b>View Mermaid Specification</b></summary>
+
 ```mermaid
-flowchart TD
-    subgraph AgentRuntime["Agent Execution Environment"]
-        AgentCore["Autonomous Agent Core\n(Inference / Tool Calling)"]
-        ProposedAction["Proposed Service Transaction"]
+graph TD
+    subgraph AgentRuntime [Agent Execution Environment]
+        AgentCore[Autonomous AI Agent<br/>Inference and Tool Calling]
+        ProposedAction[Proposed Service Transaction]
     end
 
-    subgraph SecurityKernel["AgentPay Guard Runtime Kernel"]
-        direction TB
-        L1["Layer 1: PayBind Engine\nCryptographic Intent Binding"]
-        L2["Layer 2: Anomaly Sentinel\nVelocity Heuristics & Loop Breakers"]
-        L3["Layer 3: Deterministic Spending Policies\nDynamic Limits & HITL Routing"]
+    subgraph SecurityKernel [AgentPay Guard Runtime Kernel]
+        L1[Layer 1: PayBind Engine<br/>Cryptographic Intent Binding]
+        L2[Layer 2: Anomaly Sentinel<br/>Velocity Heuristics and Loop Breakers]
+        L3[Layer 3: Deterministic Spending Policies<br/>Dynamic Limits and HITL Routing]
     end
 
-    subgraph ExecutionLayer["Solana Ledger Layer"]
-        L4["Layer 4: Financial Hub\nAnchor Program & Vault PDAs"]
-        ServiceAccount["Verified Service Provider / Peer Agent"]
-        OnChainReceipt["Immutable Service Audit Log"]
+    subgraph ExecutionLayer [Solana Ledger Layer]
+        L4[Layer 4: Financial Hub<br/>Anchor Program and Vault PDAs]
+        ServiceAccount[Verified Service Provider]
+        OnChainReceipt[Immutable Audit Receipt]
     end
 
     AgentCore --> ProposedAction
     ProposedAction --> L1
-    L1 -->|Valid Digest Hash| L2
-    L1 -.->|Hash Mismatch / Replay| Reject1["Reject: Cryptographic Invalidity"]
+    L1 -->|Valid Digest| L2
+    L1 -.->|Mismatch| Reject1[Reject: Invalid Payload Hash]
     
     L2 -->|Nominal Velocity| L3
-    L2 -.->|Velocity Breach / Loop Spike| EmergencyFreeze["Trigger: Circuit Breaker Freeze"]
+    L2 -.->|Velocity Breach| EmergencyFreeze[Circuit Breaker Freeze]
     
     L3 -->|Policy Compliant| L4
-    L3 -.->|High-Value / Unknown Recipient| HITL["Escalate: Human-in-the-Loop Gateway"]
+    L3 -.->|High-Value Threshold| HITL[Human-in-the-Loop Gateway]
     
-    L4 -->|Atomic Transfer| ServiceAccount
+    L4 -->|Atomic Settlement| ServiceAccount
     L4 -->|State Commit| OnChainReceipt
 ```
+
+</details>
 
 ### Layer 1: PayBind Engine
 - **Cryptographic Intent Binding:** Ties outgoing micropayments directly to verifiable resource payload hashes (BLAKE3/SHA-256 digests).
