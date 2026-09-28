@@ -2,9 +2,11 @@
 
 ## 1. Project Overview & Branch Strategy
 
-AgentPay Guard is an inline financial governance layer for autonomous agents on Solana. To enable parallel execution without merge conflicts, work is divided across dedicated feature branches based on module boundaries:
+AgentPay Guard is an inline financial governance layer for autonomous agents on Solana. To enable parallel execution without merge conflicts, work is divided into three distinct functional roles. 
 
-| Contributor | Feature Branch | Core Ownership | Primary Directories |
+Team members will select their preferred role from the three options below and link their feature branch accordingly:
+
+| Role / Domain | Assigned Teammate | Available Branches | Primary Directories |
 |---|---|---|---|
 | **Coreen** | `coreen` | Backend: Solana On-Chain Programs, Vault PDAs, Financial Hub | `programs/agentpay-guard/`, `tests/anchor/` |
 | **Jish** | `jish` | Backend: PayBind Engine, Anomaly Sentinel, Agent SDK Interceptor | `packages/paybind-core/`, `packages/anomaly-sentinel/`, `packages/agent-sdk/` |
@@ -58,6 +60,7 @@ AgentPay-Guard/
 - [x] Initialized Git repository workspace and synchronized with upstream.
 - [x] Authored architectural specification, threat model, and technical roadmap in `README.md`.
 - [x] Formulated four-layer verification protocol (PayBind, Anomaly Sentinel, Deterministic Policy, Financial Hub).
+- [x] Generated high-contrast native SVG architecture diagram (`assets/diagrams/protocol_architecture.svg`) and verified GitHub rendering.
 - [x] Scaffolded modular directory layout (`programs/`, `packages/`, `tests/`, `assets/`).
 - [x] Authored 7 technical engineering skills in `.agents/skills/`:
   - `solana-anchor-development`
@@ -71,7 +74,7 @@ AgentPay-Guard/
 
 ---
 
-## 4. Work Breakdown by Team Member
+## 4. Work Breakdown by Role (Pending Team Selection)
 
 ### Coreen (`coreen` branch) — Backend: Solana On-Chain & Financial Hub Lead
 *Reference Skill: [solana-anchor-development](.agents/skills/solana-anchor-development/SKILL.md) & [agent-wallet-security](.agents/skills/agent-wallet-security/SKILL.md)*
@@ -142,9 +145,9 @@ AgentPay-Guard/
 
 | Milestone | Target Date | Integration Dependencies | Deliverable |
 |---|---|---|---|
-| **M1: Interface Freeze** | Day 3 | Coreen, Jish, Vera | Finalized instruction schemas, Borsh structures, IPC signatures |
+| **M1: Interface Freeze** | Day 3 | Member 1, Member 2, Member 3 | Finalized instruction schemas, Borsh structures, IPC signatures |
 | **M2: Core Engines Complete** | Day 8 | Independent branches | Anchor contract compiled, PayBind hashing validated, Sentinel algorithms running |
-| **M3: End-to-End Pipeline** | Day 13 | `coreen` + `jish` + `vera` | Agent tool call intercepted -> Sentinel verified -> On-chain settled |
+| **M3: End-to-End Pipeline** | Day 13 | Role 1 + Role 2 + Role 3 | Agent tool call intercepted -> Sentinel verified -> On-chain settled |
 | **M4: Attack Suite Validation** | Day 17 | All branches merged to `main` | Passing simulation of prompt injection drain and recursive loops |
 | **M5: Colosseum Submission** | Day 21 | Final release | Devnet deployment, live dashboard, 3-minute video walkthrough |
 
