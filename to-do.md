@@ -8,28 +8,19 @@ Team members will select their preferred role from the three options below and l
 
 | Role / Domain | Assigned Teammate | Available Branches | Primary Directories |
 |---|---|---|---|
-| **Role 1: Solana On-Chain & Financial Hub** | `[Member 1 - TBD]` | `coreen` / `jish` / `vera` | `programs/agentpay-guard/`, `tests/anchor/` |
-| **Role 2: PayBind Engine & Agent Interceptor** | `[Member 2 - TBD]` | `coreen` / `jish` / `vera` | `packages/paybind-core/`, `packages/agent-sdk/` |
-| **Role 3: Anomaly Sentinel, HITL & Dashboard** | `[Member 3 - TBD]` | `coreen` / `jish` / `vera` | `packages/anomaly-sentinel/`, `packages/dashboard/` |
-| **Shared Infrastructure** | All Members | `main` | Root, `tests/adversarial/`, `assets/` |
-
-> *Note: Pre-created feature branches (`coreen`, `jish`, `vera`) are ready on the remote. Once members claim their roles, update the table above with your chosen branch and name.*
+| **Coreen** | `coreen` | Backend: Solana On-Chain Programs, Vault PDAs, Financial Hub | `programs/agentpay-guard/`, `tests/anchor/` |
+| **Jish** | `jish` | Backend: PayBind Engine, Anomaly Sentinel, Agent SDK Interceptor | `packages/paybind-core/`, `packages/anomaly-sentinel/`, `packages/agent-sdk/` |
+| **Vera** | `vera` | Frontend: Telemetry Dashboard, HITL Escalation Portal & Visualizer | `packages/dashboard/` |
+| **Shared** | `main` | Production-ready, verified integration builds | Root, `tests/adversarial/`, `assets/` |
 
 ### Git Workflow Guidelines
-1. Pull latest `main` before starting work:
-   ```bash
-   git fetch origin
-   git rebase origin/main
-   ```
-2. Work strictly inside your assigned directories on your designated branch:
-   ```bash
-   git checkout <your-branch>
-   ```
-3. Push branch updates regularly to remote:
-   ```bash
-   git push origin <your-branch>
-   ```
-4. Merge protocol: Push from your feature branch, test integration, and merge into `main`.
+1. Pull latest `main` before starting: `git fetch origin && git rebase origin/main`
+2. Work strictly inside your assigned directories and branch:
+   - Coreen: `git checkout coreen` (On-Chain Backend)
+   - Jish: `git checkout jish` (Off-Chain Engine & Middleware Backend)
+   - Vera: `git checkout vera` (Frontend Dashboard & UI Portal)
+3. Push branch updates regularly to remote: `git push origin <branch-name>`
+4. Submit PRs against `main` for milestone integrations with passing unit/integration tests.
 
 ---
 
@@ -39,7 +30,7 @@ Team members will select their preferred role from the three options below and l
 AgentPay-Guard/
 ├── README.md                          # Architectural specification & threat model (Shared)
 ├── to-do.md                           # Team task board & progress tracker (Shared)
-├── programs/                          # [Member 1 - TBD]
+├── programs/                          # [Backend: Coreen]
 │   └── agentpay-guard/
 │       ├── src/
 │       │   ├── lib.rs                 # Program entrypoint & instruction dispatch
@@ -48,16 +39,16 @@ AgentPay-Guard/
 │       │   └── errors.rs              # Program-specific error definitions
 │       └── Cargo.toml
 ├── packages/
-│   ├── paybind-core/                  # [Member 2 - TBD] Cryptographic intent binding & JSON hashing
-│   ├── agent-sdk/                     # [Member 2 - TBD] Runtime interceptor for LangChain / ElizaOS
-│   ├── anomaly-sentinel/              # [Member 3 - TBD] Sliding-window rate limiter & loop detection
-│   └── dashboard/                     # [Member 3 - TBD] Telemetry visualizer & HITL escalation portal
+│   ├── paybind-core/                  # [Backend: Jish] Cryptographic intent binding & canonical JSON hashing
+│   ├── agent-sdk/                     # [Backend: Jish] Runtime interceptor for LangChain / ElizaOS
+│   ├── anomaly-sentinel/              # [Backend: Jish] Sliding-window rate limiter & loop detection daemon
+│   └── dashboard/                     # [Frontend: Vera] Telemetry visualizer & HITL escalation portal
 ├── assets/
 │   ├── diagrams/                      # System diagrams & architecture flows
 │   └── screenshots/                   # Verification captures & demo graphics
 ├── tests/
-│   ├── anchor/                        # [Member 1 - TBD] LiteSVM & Bankrun smart contract unit tests
-│   └── adversarial/                   # [All Members] Prompt injection & infinite loop test harness
+│   ├── anchor/                        # [Backend: Coreen] LiteSVM & Bankrun smart contract unit tests
+│   └── adversarial/                   # [All] Prompt injection & infinite loop test harness
 └── .agents/skills/                    # Team reference playbooks & procedural skills (Shared)
 ```
 
@@ -85,8 +76,8 @@ AgentPay-Guard/
 
 ## 4. Work Breakdown by Role (Pending Team Selection)
 
-### Role 1: Solana On-Chain & Financial Hub Lead (`Member 1 - TBD`)
-*Reference Skills: [solana-anchor-development](.agents/skills/solana-anchor-development/SKILL.md) & [agent-wallet-security](.agents/skills/agent-wallet-security/SKILL.md)*
+### Coreen (`coreen` branch) — Backend: Solana On-Chain & Financial Hub Lead
+*Reference Skill: [solana-anchor-development](.agents/skills/solana-anchor-development/SKILL.md) & [agent-wallet-security](.agents/skills/agent-wallet-security/SKILL.md)*
 
 - [ ] **Anchor Program Setup:**
   - [ ] Initialize Anchor workspace inside `programs/agentpay-guard/`.
@@ -105,8 +96,8 @@ AgentPay-Guard/
 
 ---
 
-### Role 2: PayBind Engine & Agent Interceptor Lead (`Member 2 - TBD`)
-*Reference Skills: [paybind-intent-protocol](.agents/skills/paybind-intent-protocol/SKILL.md) & [agent-middleware-interceptor](.agents/skills/agent-middleware-interceptor/SKILL.md)*
+### Jish (`jish` branch) — Backend: PayBind Engine, Sentinel & Interceptor Lead
+*Reference Skill: [paybind-intent-protocol](.agents/skills/paybind-intent-protocol/SKILL.md), [agent-middleware-interceptor](.agents/skills/agent-middleware-interceptor/SKILL.md) & [velocity-heuristics-sentinel](.agents/skills/velocity-heuristics-sentinel/SKILL.md)*
 
 - [ ] **PayBind Core Package (`packages/paybind-core/`):**
   - [ ] Implement RFC 8785 JSON canonicalizer to guarantee deterministic serialization across languages.
@@ -115,30 +106,38 @@ AgentPay-Guard/
 - [ ] **Spending Policy Engine:**
   - [ ] Implement local deterministic rule evaluator: per-transaction cap, 24-hour rolling budget, destination allowlist.
   - [ ] Add policy violation classification: distinguish between hard rejection vs. HITL-eligible conditions.
+- [ ] **Velocity Heuristics & Anomaly Sentinel (`packages/anomaly-sentinel/`):**
+  - [ ] Implement sliding-window rate limiter: $T_1$ (10s burst), $T_2$ (60s acceleration), $T_3$ (hourly cap).
+  - [ ] Implement recursive reasoning loop detector (LRU ring buffer tracking identical tool call fingerprints).
+  - [ ] Build automated circuit breaker daemon: automatically invokes `freeze_vault` on-chain when anomaly threshold is reached.
 - [ ] **Agent Runtime Interceptor (`packages/agent-sdk/`):**
   - [ ] Create wrapper around Solana `@solana/web3.js` Connection and Keypair wallet adapters.
   - [ ] Intercept transaction requests before signing; invoke PayBind hashing and local policy checks.
   - [ ] Provide drop-in integration plugin/middleware for ElizaOS, LangChain, and Solana Agent Kit.
-- [ ] **SDK Unit Tests:**
+- [ ] **SDK & Sentinel Unit Tests:**
   - [ ] Test transaction interception, payload binding digest accuracy, and error return strings.
+  - [ ] Test rate-limiter windows and loop-detection triggers.
 
 ---
 
-### Role 3: Anomaly Sentinel, HITL & Dashboard Lead (`Member 3 - TBD`)
-*Reference Skills: [velocity-heuristics-sentinel](.agents/skills/velocity-heuristics-sentinel/SKILL.md) & [hitl-escalation-workflow](.agents/skills/hitl-escalation-workflow/SKILL.md)*
+### Vera (`vera` branch) — Frontend: Telemetry Dashboard & HITL Escalation Lead
+*Reference Skill: [hitl-escalation-workflow](.agents/skills/hitl-escalation-workflow/SKILL.md)*
 
-- [ ] **Velocity Heuristics Engine (`packages/anomaly-sentinel/`):**
-  - [ ] Implement sliding-window rate limiter: $T_1$ (10s burst), $T_2$ (60s acceleration), $T_3$ (hourly cap).
-  - [ ] Implement recursive reasoning loop detector (LRU ring buffer tracking identical tool call fingerprints).
-  - [ ] Build automated circuit breaker client: automatically invokes `freeze_vault` on-chain when anomaly threshold is reached.
-- [ ] **Human-in-the-Loop (HITL) Gateway:**
-  - [ ] Implement ephemeral ticket manager with UUID and expiration timeout (e.g. 180 seconds).
-  - [ ] Build escalation notification dispatcher (Webhook / Telegram bot / WebSocket).
-  - [ ] Implement cryptographic authorization ticket signer for human approval callbacks.
-- [ ] **Telemetry Dashboard (`packages/dashboard/`):**
-  - [ ] Build frontend interface showing real-time agent transaction streams, current velocity meters, and active policies.
-  - [ ] Display blocked attack notifications with reason codes and session inspection view.
-  - [ ] Add one-click manual freeze/unfreeze operator controls.
+- [ ] **Telemetry Dashboard Web Application (`packages/dashboard/`):**
+  - [ ] Scaffold modern dashboard UI (Vite / Next.js + CSS tokens & components).
+  - [ ] Build real-time agent activity feed and transaction visualizer.
+  - [ ] Create live velocity & acceleration metric gauges ($T_1, T_2, T_3$ visual indicators).
+  - [ ] Display active spending policies, whitelist addresses, and vault balance overviews.
+- [ ] **Security Alerts & Anomaly Inspector View:**
+  - [ ] Build blocked attack notification stream with reason codes, violation types, and payload diff views.
+  - [ ] Add one-click manual emergency freeze / unfreeze operator trigger controls.
+- [ ] **HITL Human Escalation Approval Portal:**
+  - [ ] Implement interactive approval queue for transactions exceeding standard thresholds.
+  - [ ] Render countdown timers for expiring tickets (e.g. 180s expiration window).
+  - [ ] Add one-click approve/reject actions with signature dispatching.
+- [ ] **Frontend Integration & E2E Testing:**
+  - [ ] Connect dashboard WebSocket/REST endpoints to backend Sentinel and on-chain RPC feeds.
+  - [ ] Ensure responsive layout, dark mode styling, and high-fidelity operator UX.
 
 ---
 
