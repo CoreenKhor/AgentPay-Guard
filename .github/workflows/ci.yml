@@ -21,7 +21,7 @@ env:
 
 jobs:
   # ---------------------------------------------------------------------------
-  # 1. Typescript Strict Typecheck & Lint
+  # 1. TypeScript Strict Typecheck & Integrity Checks
   # ---------------------------------------------------------------------------
   typescript-checks:
     name: TypeScript Strict Typecheck & Integrity
@@ -48,7 +48,13 @@ jobs:
             npx tsc --noEmit
           fi
 
-      - name: Typecheck Packages
+      - name: Run Test Suite
+        run: |
+          if [ -f package.json ]; then
+            npm test
+          fi
+
+      - name: Typecheck & Build Packages
         run: |
           for dir in packages/*; do
             if [ -d "$dir" ] && [ -f "$dir/package.json" ]; then
