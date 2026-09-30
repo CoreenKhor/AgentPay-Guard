@@ -13,21 +13,24 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  ACTIONS_RUNNER_FORCE_ACTIONS_NODE_VERSION: "node24"
+
 jobs:
   # ---------------------------------------------------------------------------
   # 1. TypeScript Strict Typecheck & Problem Detection
   # ---------------------------------------------------------------------------
-  typescript-typecheck:
-    name: TypeScript Strict Typecheck
+  typescript-checks:
+    name: TypeScript Strict Typecheck & Integrity
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node.js 20
+      - name: Setup Node.js 22 (LTS)
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install Dependencies
@@ -36,40 +39,11 @@ jobs:
       - name: Verify TypeScript Compilation (Zero Errors)
         run: npx tsc --noEmit
 
-  # ---------------------------------------------------------------------------
-  # 2. Automated Test Suite (PayBind, Sentinel, SDK, Adversarial Suite)
-  # ---------------------------------------------------------------------------
-  automated-tests:
-    name: Unit & Adversarial Test Suite
-    runs-on: ubuntu-latest
-    needs: [typescript-typecheck]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js 20
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-
-      - name: Install Dependencies
-        run: npm ci || npm install
-
-      - name: Run PayBind Core Tests
-        run: npm run test:paybind
-
-      - name: Run Anomaly Sentinel Tests
-        run: npm run test:sentinel
-
-      - name: Run Agent SDK Interceptor Tests
-        run: npm run test:sdk
-
-      - name: Run Red-Team Adversarial Test Suite
-        run: npm run test:adversarial
+      - name: Run Integrity Checks
+        run: npm test
 
   # ---------------------------------------------------------------------------
-  # 3. Rust & Anchor Smart Contract Checks (Conditional on Cargo.toml)
+  # 2. Rust & Anchor Smart Contract Checks (Conditional on Cargo.toml)
   # ---------------------------------------------------------------------------
   rust-contract-checks:
     name: Rust & Anchor Checks

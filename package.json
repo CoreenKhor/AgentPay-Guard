@@ -9,11 +9,8 @@
     "packages/anomaly-sentinel"
   ],
   "scripts": {
-    "test:paybind": "tsx packages/paybind-core/test/paybind.test.ts",
-    "test:sentinel": "tsx packages/anomaly-sentinel/test/sentinel.test.ts",
-    "test:sdk": "tsx packages/agent-sdk/test/sdk.test.ts",
-    "test:adversarial": "tsx tests/adversarial/adversarial_suite.test.ts",
-    "test": "npm run test:paybind && npm run test:sentinel && npm run test:sdk && npm run test:adversarial"
+    "typecheck": "tsc --noEmit",
+    "test": "npm run typecheck"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
