@@ -1,0 +1,19 @@
+{
+  "name": "agentpay-guard-anchor-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "tsx agentpay_guard.spec.ts"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.7.1",
+    "@solana/web3.js": "^1.95.8",
+    "bs58": "^6.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

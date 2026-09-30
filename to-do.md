@@ -79,20 +79,20 @@ AgentPay-Guard/
 ### Coreen (`coreen` branch) — Backend: Solana On-Chain & Financial Hub Lead
 *Reference Skill: [solana-anchor-development](.agents/skills/solana-anchor-development/SKILL.md) & [agent-wallet-security](.agents/skills/agent-wallet-security/SKILL.md)*
 
-- [ ] **Anchor Program Setup:**
-  - [ ] Initialize Anchor workspace inside `programs/agentpay-guard/`.
-  - [ ] Configure `Anchor.toml` for Solana Devnet and Localnet.
-- [ ] **State Machine & Account Modeling (`src/state/`):**
-  - [ ] Implement `VaultAuthority` PDA: agent pubkey, sentinel pubkey, bump, freeze status, daily budget.
-  - [ ] Implement `SpendingPolicy` PDA: per-tx limit, allowed program/recipient IDs, daily volume accumulator.
-  - [ ] Implement `ExecutionReceipt` PDA: session ID, payload hash, amount, timestamp.
-- [ ] **Instruction Handlers (`src/instructions/`):**
-  - [ ] `initialize_vault`: Set up agent treasury vault PDA and bind authority keys.
-  - [ ] `update_policy`: Modify spending limits and recipient whitelist.
-  - [ ] `settle_payment`: Atomically verify payload hash, log receipt, and disburse SOL/tokens via PDA signer seeds.
-  - [ ] `freeze_vault`: Emergency freeze callable by `sentinel_key` to halt all transfers immediately.
-- [ ] **Contract Testing:**
-  - [ ] Write Bankrun / LiteSVM tests covering successful settlement, unauthorized signer rejections, and freeze transitions.
+- [x] **Anchor Program Setup:**
+  - [x] Initialize Anchor workspace inside `programs/agentpay-guard/`.
+  - [x] Configure `Anchor.toml` for Solana Devnet and Localnet.
+- [x] **State Machine & Account Modeling (`src/state/`):**
+  - [x] Implement `VaultAuthority` PDA: agent pubkey, sentinel pubkey, bump, freeze status, daily budget.
+  - [x] Implement `SpendingPolicy` PDA: per-tx limit, allowed program/recipient IDs, daily volume accumulator.
+  - [x] Implement `ExecutionReceipt` PDA: session ID, payload hash, amount, timestamp.
+- [x] **Instruction Handlers (`src/instructions/`):**
+  - [x] `initialize_vault`: Set up agent treasury vault PDA and bind authority keys.
+  - [x] `update_policy`: Modify spending limits and recipient whitelist.
+  - [x] `settle_payment`: Atomically verify payload hash, log receipt, and disburse SOL/tokens via PDA signer seeds.
+  - [x] `freeze_vault`: Emergency freeze callable by `sentinel_key` to halt all transfers immediately.
+- [x] **Contract Testing:**
+  - [x] Write Bankrun / LiteSVM tests covering successful settlement, unauthorized signer rejections, and freeze transitions.
 
 ---
 

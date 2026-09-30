@@ -6,11 +6,14 @@
   "workspaces": [
     "packages/paybind-core",
     "packages/agent-sdk",
-    "packages/anomaly-sentinel"
+    "packages/anomaly-sentinel",
+    "packages/dashboard",
+    "tests/anchor"
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "npm run typecheck"
+    "test": "npm run test:anchor",
+    "test:anchor": "tsx tests/anchor/agentpay_guard.spec.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
