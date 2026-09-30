@@ -99,24 +99,24 @@ AgentPay-Guard/
 ### Jish (`jish` branch) — Backend: PayBind Engine, Sentinel & Interceptor Lead
 *Reference Skill: [paybind-intent-protocol](.agents/skills/paybind-intent-protocol/SKILL.md), [agent-middleware-interceptor](.agents/skills/agent-middleware-interceptor/SKILL.md) & [velocity-heuristics-sentinel](.agents/skills/velocity-heuristics-sentinel/SKILL.md)*
 
-- [ ] **PayBind Core Package (`packages/paybind-core/`):**
-  - [ ] Implement RFC 8785 JSON canonicalizer to guarantee deterministic serialization across languages.
-  - [ ] Implement SHA-256 and BLAKE3 payload hashing for service quotes, API requests, and response schemas.
-  - [ ] Build intent verification utilities to compare received response hashes against registered quotes.
-- [ ] **Spending Policy Engine:**
-  - [ ] Implement local deterministic rule evaluator: per-transaction cap, 24-hour rolling budget, destination allowlist.
-  - [ ] Add policy violation classification: distinguish between hard rejection vs. HITL-eligible conditions.
-- [ ] **Velocity Heuristics & Anomaly Sentinel (`packages/anomaly-sentinel/`):**
-  - [ ] Implement sliding-window rate limiter: $T_1$ (10s burst), $T_2$ (60s acceleration), $T_3$ (hourly cap).
-  - [ ] Implement recursive reasoning loop detector (LRU ring buffer tracking identical tool call fingerprints).
-  - [ ] Build automated circuit breaker daemon: automatically invokes `freeze_vault` on-chain when anomaly threshold is reached.
-- [ ] **Agent Runtime Interceptor (`packages/agent-sdk/`):**
-  - [ ] Create wrapper around Solana `@solana/web3.js` Connection and Keypair wallet adapters.
-  - [ ] Intercept transaction requests before signing; invoke PayBind hashing and local policy checks.
-  - [ ] Provide drop-in integration plugin/middleware for ElizaOS, LangChain, and Solana Agent Kit.
-- [ ] **SDK & Sentinel Unit Tests:**
-  - [ ] Test transaction interception, payload binding digest accuracy, and error return strings.
-  - [ ] Test rate-limiter windows and loop-detection triggers.
+- [x] **PayBind Core Package (`packages/paybind-core/`):**
+  - [x] Implement RFC 8785 JSON canonicalizer to guarantee deterministic serialization across languages.
+  - [x] Implement SHA-256 and BLAKE3 payload hashing for service quotes, API requests, and response schemas.
+  - [x] Build intent verification utilities to compare received response hashes against registered quotes.
+- [x] **Spending Policy Engine:**
+  - [x] Implement local deterministic rule evaluator: per-transaction cap, 24-hour rolling budget, destination allowlist.
+  - [x] Add policy violation classification: distinguish between hard rejection vs. HITL-eligible conditions.
+- [x] **Velocity Heuristics & Anomaly Sentinel (`packages/anomaly-sentinel/`):**
+  - [x] Implement sliding-window rate limiter: $T_1$ (10s burst), $T_2$ (60s acceleration), $T_3$ (hourly cap).
+  - [x] Implement recursive reasoning loop detector (LRU ring buffer tracking identical tool call fingerprints).
+  - [x] Build automated circuit breaker daemon: automatically invokes `freeze_vault` on-chain when anomaly threshold is reached.
+- [x] **Agent Runtime Interceptor (`packages/agent-sdk/`):**
+  - [x] Create wrapper around Solana `@solana/web3.js` Connection and Keypair wallet adapters.
+  - [x] Intercept transaction requests before signing; invoke PayBind hashing and local policy checks.
+  - [x] Provide drop-in integration plugin/middleware for ElizaOS, LangChain, and Solana Agent Kit.
+- [x] **SDK & Sentinel Unit Tests:**
+  - [x] Test transaction interception, payload binding digest accuracy, and error return strings.
+  - [x] Test rate-limiter windows and loop-detection triggers.
 
 ---
 

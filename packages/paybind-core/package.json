@@ -1,0 +1,21 @@
+{
+  "name": "@agentpay-guard/paybind-core",
+  "version": "1.0.0",
+  "description": "Cryptographic intent binding, RFC 8785 canonicalization, BLAKE3/SHA-256 hashing, and deterministic spending policy engine for autonomous agents",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "keywords": [
+    "solana",
+    "ai-agents",
+    "cryptographic-binding",
+    "paybind",
+    "rfc8785",
+    "financial-governance"
+  ],
+  "author": "AgentPay Guard Team",
+  "license": "Apache-2.0"
+}

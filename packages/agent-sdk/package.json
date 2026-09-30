@@ -1,0 +1,29 @@
+{
+  "name": "@agentpay-guard/agent-sdk",
+  "version": "1.0.0",
+  "description": "Runtime transaction interceptor, wallet adapter wrapper, and agent framework middleware (ElizaOS, LangChain, Solana Agent Kit) for AgentPay Guard",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@agentpay-guard/paybind-core": "*",
+    "@agentpay-guard/anomaly-sentinel": "*",
+    "@solana/web3.js": "^1.95.8",
+    "bs58": "^6.0.0",
+    "tweetnacl": "^1.0.3"
+  },
+  "keywords": [
+    "solana",
+    "ai-agents",
+    "langchain",
+    "elizaos",
+    "solana-agent-kit",
+    "middleware",
+    "interceptor"
+  ],
+  "author": "AgentPay Guard Team",
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,29 @@
+{
+  "name": "agentpay-guard-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/paybind-core",
+    "packages/agent-sdk",
+    "packages/anomaly-sentinel"
+  ],
+  "scripts": {
+    "test:paybind": "tsx packages/paybind-core/test/paybind.test.ts",
+    "test:sentinel": "tsx packages/anomaly-sentinel/test/sentinel.test.ts",
+    "test:sdk": "tsx packages/agent-sdk/test/sdk.test.ts",
+    "test:adversarial": "tsx tests/adversarial/adversarial_suite.test.ts",
+    "test": "npm run test:paybind && npm run test:sentinel && npm run test:sdk && npm run test:adversarial"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "@noble/hashes": "^1.7.1",
+    "@solana/web3.js": "^1.95.8",
+    "bs58": "^6.0.0",
+    "tweetnacl": "^1.0.3"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "baseUrl": ".",
+    "paths": {
+      "@agentpay-guard/paybind-core": ["./packages/paybind-core/src/index.ts"],
+      "@agentpay-guard/agent-sdk": ["./packages/agent-sdk/src/index.ts"],
+      "@agentpay-guard/anomaly-sentinel": ["./packages/anomaly-sentinel/src/index.ts"]
+    }
+  },
+  "include": ["packages/**/*", "tests/**/*"]
+}
