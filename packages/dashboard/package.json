@@ -1,0 +1,19 @@
+{
+  "name": "@agentpay-guard/dashboard",
+  "version": "1.0.0",
+  "description": "Real-time telemetry visualizer, HITL escalation portal, and emergency circuit breaker console for AgentPay Guard",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [
+    "dashboard",
+    "telemetry",
+    "hitl",
+    "circuit-breaker",
+    "solana"
+  ],
+  "author": "AgentPay Guard Team",
+  "license": "Apache-2.0"
+}

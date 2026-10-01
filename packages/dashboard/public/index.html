@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgentPay Guard · Autonomous Financial Governance on Solana</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Top Minimalist Web3 Navigation Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="header-brand">
+          <div class="brand-logo">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2L3 6V12C3 17.5 6.8 22.7 12 24C17.2 22.7 21 17.5 21 12V6L12 2Z" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 12L11 14L15 10" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <div class="brand-row">
+              <span class="brand-name">AgentPay<span class="brand-accent">Guard</span></span>
+              <span class="badge-colosseum">COLOSSEUM</span>
+            </div>
+            <span class="brand-desc">Inline Financial Governance for Autonomous Agents</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segmented Navigation Tabs: 3 Unified Core Workflows -->
+      <nav class="nav-segmented">
+        <button class="nav-tab active" data-tab="overview" onclick="switchTab('overview')">
+          <span class="tab-label">Overview</span>
+        </button>
+        <button class="nav-tab" data-tab="lab-ledger" onclick="switchTab('lab-ledger')">
+          <span class="tab-label">Security Lab & Ledger</span>
+          <span id="tab-tx-badge" class="tab-counter">0</span>
+        </button>
+        <button class="nav-tab" data-tab="hitl" onclick="switchTab('hitl')">
+          <span class="tab-label">HITL Review</span>
+          <span id="tab-hitl-badge" class="tab-counter counter-amber">0</span>
+        </button>
+      </nav>
+
+      <!-- Right System Telemetry & Emergency Controls -->
+      <div class="header-right">
+        <!-- Cluster Status -->
+        <div class="cluster-badge">
+          <span class="pulse-dot"></span>
+          <span class="cluster-name">Solana Devnet</span>
+          <span class="cluster-ping">400ms</span>
+        </div>
+
+        <!-- Sentinel Status Indicator -->
+        <div id="system-status-indicator" class="status-badge status-normal">
+          <span class="status-dot"></span>
+          <span id="system-status-text">Kernel Armed</span>
+        </div>
+
+        <!-- Emergency Circuit Freeze Toggle -->
+        <button id="btn-toggle-circuit" class="btn btn-freeze" onclick="toggleCircuitBreaker()">
+          <span class="btn-freeze-icon">⚠</span>
+          <span id="btn-toggle-text">Emergency Freeze</span>
+        </button>
+
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" class="btn-theme" onclick="toggleTheme()" title="Toggle Theme" aria-label="Toggle Theme">
+          <svg id="theme-icon-sun" class="theme-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1" x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg id="theme-icon-moon" class="theme-svg hidden" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- Emergency Circuit Breaker HUD Banner (Shown when Frozen) -->
+    <div id="emergency-banner" class="emergency-banner hidden">
+      <div class="emergency-left">
+        <span class="emergency-dot"></span>
+        <span class="emergency-tag">CIRCUIT TRIPPED</span>
+        <span class="emergency-desc">Vault PDA frozen by Sentinel. All autonomous disbursements halted on Solana.</span>
+      </div>
+      <button class="btn btn-reset" onclick="resetCircuitBreaker()">
+        Reset Circuit & Restore Operations
+      </button>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- TAB 1: OVERVIEW DASHBOARD                                         -->
+    <!-- ================================================================= -->
+    <section id="tab-content-overview" class="tab-view active">
+      <!-- 4 Top Metric Cards -->
+      <div class="metrics-grid">
+        <!-- Metric 1: 24-Hour Outflow -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">24H Autonomous Outflow</span>
+            <span class="metric-badge">0.500 SOL Cap</span>
+          </div>
+          <div class="metric-value-row">
+            <span id="metric-daily-spent" class="metric-number font-mono">0.040</span>
+            <span class="metric-unit">SOL</span>
+          </div>
+          <div class="progress-track">
+            <div id="daily-spend-progress" class="progress-fill fill-emerald" style="width: 8%;"></div>
+          </div>
+          <div class="metric-footer">
+            <span><span id="metric-daily-pct" class="font-mono text-emerald">8.0%</span> Utilized</span>
+            <span id="metric-daily-lamports" class="font-mono text-muted">40,000,000 Lamports</span>
+          </div>
+        </div>
+
+        <!-- Metric 2: T1 Burst Rate (10s) -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">T1 Burst Window (10s)</span>
+            <span class="metric-badge">Max 3 tx</span>
+          </div>
+          <div class="metric-value-row">
+            <span id="metric-t1-count" class="metric-number font-mono">0</span>
+            <span class="metric-unit">/ 3 tx</span>
+          </div>
+          <div class="progress-track">
+            <div id="t1-progress" class="progress-fill fill-emerald" style="width: 0%;"></div>
+          </div>
+          <div class="metric-footer">
+            <span>Burst Threshold: &gt; 3 tx</span>
+            <span class="text-emerald">Nominal</span>
+          </div>
+        </div>
+
+        <!-- Metric 3: T2 Acceleration (60s) -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">T2 Acceleration (60s)</span>
+            <span class="metric-badge">Max 15 tx</span>
+          </div>
+          <div class="metric-value-row">
+            <span id="metric-t2-count" class="metric-number font-mono">2</span>
+            <span class="metric-unit">/ 15 tx</span>
+          </div>
+          <div class="progress-track">
+            <div id="t2-progress" class="progress-fill fill-emerald" style="width: 13%;"></div>
+          </div>
+          <div class="metric-footer">
+            <span>Velocity: <span id="metric-t2-cadence" class="font-mono text-main">0.03</span> tx/s</span>
+            <span class="text-muted">Cadence Steady</span>
+          </div>
+        </div>
+
+        <!-- Metric 4: Leaky Bucket Capacity Buffer -->
+        <div class="metric-card">
+          <div class="metric-header">
+            <span class="metric-title">Leaky Bucket Buffer</span>
+            <span class="metric-badge">100 Capacity</span>
+          </div>
+          <div class="metric-value-row">
+            <span id="metric-leaky-level" class="metric-number font-mono">20</span>
+            <span class="metric-unit">/ 100 units</span>
+          </div>
+          <div class="progress-track">
+            <div id="leaky-progress" class="progress-fill fill-emerald" style="width: 20%;"></div>
+          </div>
+          <div class="metric-footer">
+            <span>Drain Rate: 2.0 u/s</span>
+            <span class="text-emerald">Capacity Stable</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Real-Time Velocity Waveform & Solana Hub State -->
+      <div class="overview-grid">
+        <!-- Live Velocity Chart -->
+        <div class="card chart-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <span class="pulse-dot"></span>
+              <h2 class="card-title">Real-Time Velocity & Outflow Waveform</h2>
+            </div>
+            <div class="chart-legend">
+              <span class="legend-item"><span class="legend-dot dot-emerald"></span> Outflow (SOL)</span>
+              <span class="legend-item"><span class="legend-dot dot-slate"></span> Velocity (tx/s)</span>
+              <span class="live-pill">LIVE</span>
+            </div>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="velocity-chart" width="760" height="180"></canvas>
+          </div>
+          <div class="chart-footer">
+            <span>Window: Sliding 60-second real-time telemetry</span>
+            <span>Sampling: 1000ms / tick</span>
+          </div>
+        </div>
+
+        <!-- Solana Non-Custodial PDA Hub -->
+        <div class="card vault-card">
+          <div class="card-header">
+            <h2 class="card-title">Solana Financial Hub State</h2>
+            <span class="badge-subtle">Non-Custodial PDA</span>
+          </div>
+          <div class="invariants-list">
+            <!-- Vault PDA -->
+            <div class="pda-block">
+              <div class="pda-label">Agent Vault PDA (Treasury)</div>
+              <div class="pda-value-box">
+                <span id="vault-pda-text" class="font-mono text-main truncate">Loading PDA...</span>
+                <button class="btn-copy" onclick="copyText('vault-pda-text')" title="Copy Address">Copy</button>
+              </div>
+            </div>
+
+            <!-- Sentinel Authority -->
+            <div class="pda-block">
+              <div class="pda-label">Sentinel Authority (Off-Chain Signer)</div>
+              <div class="pda-value-box">
+                <span id="sentinel-pda-text" class="font-mono text-muted truncate">Loading Sentinel...</span>
+                <button class="btn-copy" onclick="copyText('sentinel-pda-text')" title="Copy Address">Copy</button>
+              </div>
+            </div>
+
+            <!-- Invariant Split Triple -->
+            <div class="tri-metric-grid">
+              <div class="tri-metric-item">
+                <span class="tri-label">Per-Tx Ceiling</span>
+                <span class="tri-val font-mono">0.100 SOL</span>
+              </div>
+              <div class="tri-metric-item">
+                <span class="tri-label">HITL Review</span>
+                <span class="tri-val font-mono text-amber">0.050 SOL</span>
+              </div>
+              <div class="tri-metric-item">
+                <span class="tri-label">Allowlist Filter</span>
+                <span class="tri-val text-emerald">Enforced</span>
+              </div>
+            </div>
+
+            <!-- Whitelisted Counterparties -->
+            <div class="pda-block">
+              <div class="pda-label">Whitelisted Counterparties</div>
+              <div id="allowlist-tags" class="allowlist-chips">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Split: Recent Intercepts & Sentinel Incidents -->
+      <div class="overview-bottom-grid">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Recent Intercept Activity</h2>
+            <button class="btn-link" onclick="switchTab('lab-ledger')">View All in Lab & Ledger →</button>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 80px;">Time</th>
+                  <th>Agent</th>
+                  <th>Counterparty / Service</th>
+                  <th class="text-right">Amount</th>
+                  <th>PayBind Digest</th>
+                  <th class="text-right">Status</th>
+                </tr>
+              </thead>
+              <tbody id="overview-tx-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Sentinel Incidents & Circuit Events</h2>
+          </div>
+          <div id="overview-incidents-container" class="incident-list">
+            <p class="empty-state-text">No incidents recorded</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 2: UNIFIED SECURITY LAB & AUDIT LEDGER (COMBINED COCKPIT)     -->
+    <!-- ================================================================= -->
+    <section id="tab-content-lab-ledger" class="tab-view">
+      <!-- Top Section: Attack Simulator & High-Signal Diagnostics -->
+      <div class="lab-cockpit-grid">
+        <!-- Left: 5 Attack Scenario Cards -->
+        <div class="card attack-suite-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2 class="card-title">Adversarial Attack Simulator</h2>
+              <span class="badge-defense">5/5 DEFENDED</span>
+            </div>
+            <span class="header-hint">Launch vectors to test real-time kernel defense</span>
+          </div>
+
+          <div class="attack-cards-list">
+            <!-- Scenario 1 -->
+            <div class="attack-scenario" onclick="triggerSimulation('ATK-01')">
+              <div class="scenario-top">
+                <span class="scenario-code code-red">ATK-01</span>
+                <span class="scenario-tag tag-red">HIGH SEVERITY</span>
+              </div>
+              <div class="scenario-title">Prompt Injection Treasury Drain</div>
+              <div class="scenario-desc">Simulates a jailbroken agent attempting an unauthorized siphon of treasury funds to an unlisted attacker wallet.</div>
+              <div class="scenario-defense">
+                <span class="defense-label">Defense:</span> Layer 3 Deterministic Allowlist & Layer 2 Velocity Breaker
+              </div>
+              <button class="btn-run-attack">Simulate Attack</button>
+            </div>
+
+            <!-- Scenario 2 -->
+            <div class="attack-scenario" onclick="triggerSimulation('ATK-02')">
+              <div class="scenario-top">
+                <span class="scenario-code code-amber">ATK-02</span>
+                <span class="scenario-tag tag-amber">MEDIUM SEVERITY</span>
+              </div>
+              <div class="scenario-title">Infinite Reasoning Loop (Tool Recursion)</div>
+              <div class="scenario-desc">Simulates an unhandled inference exception triggering rapid duplicate tool executions within milliseconds.</div>
+              <div class="scenario-defense">
+                <span class="defense-label">Defense:</span> Layer 2 LRU Ring Buffer (Trips at Iteration 3)
+              </div>
+              <button class="btn-run-attack">Simulate Loop</button>
+            </div>
+
+            <!-- Scenario 3 -->
+            <div class="attack-scenario" onclick="triggerSimulation('ATK-03')">
+              <div class="scenario-top">
+                <span class="scenario-code code-red">ATK-03</span>
+                <span class="scenario-tag tag-red">CRITICAL SEVERITY</span>
+              </div>
+              <div class="scenario-title">Resource Substitution (MITM Data Poisoning)</div>
+              <div class="scenario-desc">Simulates a compromised compute node returning altered weights after receiving micropayment settlement.</div>
+              <div class="scenario-defense">
+                <span class="defense-label">Defense:</span> Layer 1 PayBind RFC 8785 SHA-256 Digest Verification
+              </div>
+              <button class="btn-run-attack">Simulate Poisoning</button>
+            </div>
+
+            <!-- Scenario 4 -->
+            <div class="attack-scenario" onclick="triggerSimulation('HITL_TRIGGER')">
+              <div class="scenario-top">
+                <span class="scenario-code code-amber">VEC-04</span>
+                <span class="scenario-tag tag-amber">ESCALATION</span>
+              </div>
+              <div class="scenario-title">High-Value Out-of-Bounds Spend</div>
+              <div class="scenario-desc">Submits a 0.085 SOL transaction exceeding the 0.050 SOL autonomous cap to verify human review escalation.</div>
+              <div class="scenario-defense">
+                <span class="defense-label">Defense:</span> Layer 3 Ephemeral Ticket & Ed25519 Signer Protocol
+              </div>
+              <button class="btn-run-attack">Simulate Escalation</button>
+            </div>
+
+            <!-- Scenario 5 -->
+            <div class="attack-scenario" onclick="triggerSimulation('NORMAL_TX')">
+              <div class="scenario-top">
+                <span class="scenario-code code-emerald">VEC-05</span>
+                <span class="scenario-tag tag-emerald">NOMINAL</span>
+              </div>
+              <div class="scenario-title">Verified Micropayment Settlement</div>
+              <div class="scenario-desc">Executes a legitimate 0.005 SOL oracle query, demonstrating sub-second settlement from Vault PDA.</div>
+              <div class="scenario-defense">
+                <span class="defense-label">Result:</span> Atomic On-Chain Settlement (400ms Devnet)
+              </div>
+              <button class="btn-run-attack">Run Settlement</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Focused Security Diagnostics & High-Signal Filtered Log -->
+        <div class="card diagnostic-card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <span class="pulse-dot"></span>
+              <h2 class="card-title">Security Kernel Diagnostics</h2>
+            </div>
+            <button class="btn-terminal-clear" onclick="clearTerminal()">Clear Log</button>
+          </div>
+
+          <!-- Real-Time Threat Diagnostic Strip -->
+          <div class="diag-threat-strip">
+            <div class="threat-kpi">
+              <span class="threat-label">Latest Vector</span>
+              <span class="threat-val" id="diag-vector">Ready</span>
+            </div>
+            <div class="threat-kpi">
+              <span class="threat-label">Defense Invariant</span>
+              <span class="threat-val text-emerald" id="diag-layer">Sentinel Armed</span>
+            </div>
+            <div class="threat-kpi">
+              <span class="threat-label">Kernel Action</span>
+              <span class="threat-val" id="diag-action">Awaiting Traffic</span>
+            </div>
+          </div>
+
+          <!-- Log Category Segmented Tabs (Separates Attack Simulations from System Ops) -->
+          <div class="log-category-nav">
+            <button class="log-cat-btn active" data-category="ALL" onclick="filterLogCategory('ALL')">
+              All (<span id="log-count-all">1</span>)
+            </button>
+            <button class="log-cat-btn" data-category="SIM" onclick="filterLogCategory('SIM')">
+              Attack Defense Traces (<span id="log-count-sim">0</span>)
+            </button>
+            <button class="log-cat-btn" data-category="SYS" onclick="filterLogCategory('SYS')">
+              Kernel & Sentinel (<span id="log-count-sys">1</span>)
+            </button>
+          </div>
+
+          <!-- Clean Event Feed -->
+          <div id="sim-terminal-log" class="terminal-body font-mono">
+            <!-- Dynamically populated by renderLogs() -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Section: Live Transaction Audit Ledger -->
+      <div class="card ledger-card">
+        <div class="card-header">
+          <div class="card-header-left">
+            <h2 class="card-title">Immutable Transaction Audit Ledger</h2>
+            <span class="live-pill">
+              <span class="pulse-dot"></span> Live Telemetry
+            </span>
+            <span class="header-hint">· Click any row to inspect 4-layer cryptographic proof</span>
+          </div>
+
+          <!-- Filters -->
+          <div class="filter-segmented">
+            <button class="filter-btn active" onclick="filterTransactions('ALL')">All</button>
+            <button class="filter-btn" onclick="filterTransactions('SETTLED')">Settled</button>
+            <button class="filter-btn" onclick="filterTransactions('HITL_PENDING')">Review</button>
+            <button class="filter-btn" onclick="filterTransactions('BLOCKED')">Blocked</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="width: 90px;">Timestamp</th>
+                <th style="width: 140px;">Calling Agent</th>
+                <th>Counterparty / Resource</th>
+                <th style="width: 130px;" class="text-right">Value (SOL)</th>
+                <th style="width: 140px;">PayBind Digest</th>
+                <th style="width: 110px;" class="text-right">Status</th>
+              </tr>
+            </thead>
+            <tbody id="tx-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card-footer">
+          <span id="ledger-count-info">Loading transactions...</span>
+          <span class="text-muted">Anchor Financial Hub · PDA Settlement Proofs</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================================================================= -->
+    <!-- TAB 3: HUMAN-IN-THE-LOOP (HITL) APPROVAL PORTAL                   -->
+    <!-- ================================================================= -->
+    <section id="tab-content-hitl" class="tab-view">
+      <div class="hitl-layout-grid">
+        <!-- Left: Active Approval Queue -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-header-left">
+              <h2 class="card-title">Human-in-the-Loop Escalation Queue</h2>
+              <span id="hitl-queue-badge" class="count-pill">0</span>
+            </div>
+            <span class="text-amber text-xs">Asynchronous Operator Key Signing</span>
+          </div>
+
+          <p class="card-intro">
+            Transactions exceeding autonomous spending caps (0.050 SOL) or exhibiting anomalous parameters are suspended.
+            Authorize or reject using the registered operator Ed25519 administrative key.
+          </p>
+
+          <div id="hitl-queue-container" class="queue-list">
+            <!-- Dynamically populated ticket cards with countdown -->
+          </div>
+        </div>
+
+        <!-- Right: HITL Protocol Invariants -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Cryptographic Signing Protocol</h2>
+          </div>
+          <div class="protocol-body">
+            <div class="protocol-step">
+              <div class="step-num">01</div>
+              <div class="step-content">
+                <span class="step-title">Ephemeral Ticket Generation</span>
+                <p class="step-desc">Tickets exist for a maximum TTL of 180 seconds. Expired tickets are permanently dropped by the kernel to avoid re-play attacks.</p>
+              </div>
+            </div>
+            <div class="protocol-step">
+              <div class="step-num">02</div>
+              <div class="step-content">
+                <span class="step-title">Ed25519 Detached Signature</span>
+                <p class="step-desc">Approvals compute SHA-256(ticketId : agentId : recipient : amount : digest : expiry) and sign with the operator private key.</p>
+              </div>
+            </div>
+            <div class="protocol-step">
+              <div class="step-num">03</div>
+              <div class="step-content">
+                <span class="step-title">Atomic On-Chain Settlement</span>
+                <p class="step-desc">Upon valid signature verification, funds disburse non-custodially from the Agent Vault PDA to the verified recipient.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ================================================================= -->
+  <!-- TRANSACTION INSPECTOR DRAWER (SLIDE-IN MODAL)                     -->
+  <!-- ================================================================= -->
+  <div id="inspector-overlay" class="inspector-overlay hidden" onclick="handleOverlayClick(event)">
+    <div class="inspector-drawer" id="inspector-drawer">
+      <div class="inspector-header">
+        <div class="inspector-header-info">
+          <div class="inspector-tag-row">
+            <span id="insp-status-badge" class="status-pill">Status</span>
+            <span id="insp-vector-badge" class="vector-badge-pill tag-red font-mono">VECTOR</span>
+            <span id="insp-tx-id" class="font-mono text-muted text-xs">tx-id</span>
+          </div>
+          <h3 class="inspector-title" id="insp-recipient-label">Recipient Label</h3>
+          <div class="inspector-scenario-hint font-mono text-xs text-muted" id="insp-scenario-hint">Origin: Adversarial Simulation ATK-01</div>
+        </div>
+        <button class="btn-close" onclick="closeInspector()" title="Close Inspector" aria-label="Close Inspector">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="inspector-content">
+        <!-- 4-Layer Security Audit Pipeline Step Cards -->
+        <div class="inspector-section">
+          <div class="section-title">4-Layer Security Audit Pipeline</div>
+          <div class="audit-pipeline">
+            <div class="audit-step" id="audit-step-l1">
+              <span class="audit-badge font-mono">L1</span>
+              <div class="audit-step-body">
+                <span class="audit-step-title">PayBind Intent Protocol</span>
+                <span class="audit-step-desc font-mono" id="audit-l1-desc">Hash Digest Binding</span>
+              </div>
+              <span class="audit-step-icon font-mono" id="audit-l1-icon">✓</span>
+            </div>
+
+            <div class="audit-step" id="audit-step-l2">
+              <span class="audit-badge font-mono">L2</span>
+              <div class="audit-step-body">
+                <span class="audit-step-title">Anomaly Sentinel</span>
+                <span class="audit-step-desc font-mono" id="audit-l2-desc">Velocity & Loop Guard</span>
+              </div>
+              <span class="audit-step-icon font-mono" id="audit-l2-icon">✓</span>
+            </div>
+
+            <div class="audit-step" id="audit-step-l3">
+              <span class="audit-badge font-mono">L3</span>
+              <div class="audit-step-body">
+                <span class="audit-step-title">Deterministic Policy</span>
+                <span class="audit-step-desc font-mono" id="audit-l3-desc">Allowlist & Ceilings</span>
+              </div>
+              <span class="audit-step-icon font-mono" id="audit-l3-icon">✓</span>
+            </div>
+
+            <div class="audit-step" id="audit-step-l4">
+              <span class="audit-badge font-mono">L4</span>
+              <div class="audit-step-body">
+                <span class="audit-step-title">Solana Financial Hub</span>
+                <span class="audit-step-desc font-mono" id="audit-l4-desc">Anchor PDA Settlement</span>
+              </div>
+              <span class="audit-step-icon font-mono" id="audit-l4-icon">✓</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Key Parameters -->
+        <div class="inspector-section">
+          <div class="section-title">Transaction Parameters</div>
+          <div class="param-grid">
+            <div class="param-item">
+              <span class="param-label">Amount</span>
+              <span class="param-val font-mono text-emerald" id="insp-amount">0.015 SOL</span>
+            </div>
+            <div class="param-item">
+              <span class="param-label">Calling Agent</span>
+              <span class="param-val font-mono text-main truncate" id="insp-agent">agent-quant-01</span>
+            </div>
+            <div class="param-item full-width">
+              <span class="param-label">API Endpoint</span>
+              <span class="param-val font-mono text-main truncate" id="insp-endpoint">/api/pyth/sol_usd</span>
+            </div>
+            <div class="param-item full-width">
+              <div class="param-header-row">
+                <span class="param-label">Solana Signature</span>
+                <button class="btn-copy-micro font-mono" onclick="copyText('insp-signature')" title="Copy Signature">Copy</button>
+              </div>
+              <div class="signature-box">
+                <span class="param-val-sig font-mono text-muted" id="insp-signature">sim-tx...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PayBind RFC 8785 Digest Verification -->
+        <div class="inspector-section">
+          <div class="section-title">PayBind Digest Verification (RFC 8785)</div>
+          <div class="hash-box">
+            <div class="hash-row">
+              <span class="hash-label">Expected:</span>
+              <code class="hash-code font-mono truncate text-emerald" id="insp-expected-hash">e3b0c44298fc...</code>
+            </div>
+            <div class="hash-row" id="insp-delivered-hash-row">
+              <span class="hash-label">Delivered:</span>
+              <code class="hash-code font-mono truncate text-red" id="insp-delivered-hash">e3b0c44298fc...</code>
+            </div>
+          </div>
+          <div id="insp-hash-diff-alert" class="hash-alert hidden"></div>
+        </div>
+
+        <!-- Service Payload JSON -->
+        <div class="inspector-section">
+          <div class="section-title">Service Payload (JSON)</div>
+          <pre class="json-box font-mono" id="insp-json-payload">{}</pre>
+        </div>
+
+        <!-- Security Notes -->
+        <div class="inspector-section">
+          <div class="section-title">Kernel Security Notes</div>
+          <div class="notes-box" id="insp-notes">Validated by AgentPay Guard security kernel.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container (Ultra-Clean Micro Pill) -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
