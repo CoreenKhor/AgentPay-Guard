@@ -227,10 +227,11 @@ AgentPay-Guard/
 │       │   └── errors.rs              # Program-specific error declarations
 │       └── Cargo.toml
 ├── packages/
-│   ├── paybind-core/                  # Cryptographic intent binding & schema tools
-│   ├── agent-sdk/                     # Runtime interceptor for LangChain / ElizaOS
-│   ├── anomaly-sentinel/              # Velocity heuristics & circuit breaker daemon
-├── .agents/skills/                     # Team engineering skills & agent playbooks
+│   ├── paybind-core/                  # Cryptographic intent binding, RFC 8785 canonicalization & policy engine
+│   ├── anomaly-sentinel/              # Velocity heuristics, sliding-window rate limiters & circuit breakers
+│   ├── agent-sdk/                     # Runtime interceptor & adapters (ElizaOS, LangChain, Solana Agent Kit)
+│   └── dashboard/                     # Telemetry visualizer & HITL escalation portal UI
+├── .agents/skills/                    # Team engineering skills & agent playbooks
 │   ├── solana-anchor-development/     # Anchor & PDA development procedures
 │   ├── agent-wallet-security/         # Non-custodial vault & key management standards
 │   ├── paybind-intent-protocol/       # Payload canonicalization & hash binding specs
@@ -239,7 +240,7 @@ AgentPay-Guard/
 │   ├── hitl-escalation-workflow/      # Asynchronous human-in-the-loop escalation
 │   └── adversarial-attack-simulation/ # Jailbreak & wallet-drain test harness
 └── tests/
-    ├── anchor/                        # LiteSVM / Bankrun smart contract tests
+    ├── anchor/                        # Anchor program unit and integration tests
     └── adversarial/                   # Prompt injection & infinite loop test harness
 ```
 
@@ -249,10 +250,10 @@ AgentPay-Guard/
 
 The repository includes curated engineering playbooks located in `.agents/skills/` to standardize development across the team:
 
-- [Solana Anchor Program Development](file:///c:/Users/jishn/Documents/hackathon/colosseum/AgentPay-Guard/.agents/skills/solana-anchor-development/SKILL.md) — Anchor program architecture, PDA constraints, CPI safety, and LiteSVM/Bankrun testing.
-- [Agent Wallet Security Standards](file:///c:/Users/jishn/Documents/hackathon/colosseum/AgentPay-Guard/.agents/skills/agent-wallet-security/SKILL.md) — Non-custodial vault architectures, key isolation, and preventing prompt-injection key leaks.
-- [PayBind Intent Protocol Specification](file:///c:/Users/jishn/Documents/hackathon/colosseum/AgentPay-Guard/.agents/skills/paybind-intent-protocol/SKILL.md) — RFC 8785 canonical serialization, BLAKE3/SHA-256 payload digest generation, and atomic delivery verification.
-- [Agent Middleware & Interceptor Architecture](file:///c:/Users/jishn/Documents/hackathon/colosseum/AgentPay-Guard/.agents/skills/agent-middleware-interceptor/SKILL.md) — Tool-calling interception patterns for LangChain, ElizaOS, and Solana Agent Kit.
-- [Anomaly Sentinel & Velocity Heuristics](file:///c:/Users/jishn/Documents/hackathon/colosseum/AgentPay-Guard/.agents/skills/velocity-heuristics-sentinel/SKILL.md) — Sliding-window algorithms, leaky-bucket rate limiting, recursive loop detection, and freeze triggers.
-- [Human-in-the-Loop Escalation Workflows](file:///c:/Users/jishn/Documents/hackathon/colosseum/AgentPay-Guard/.agents/skills/hitl-escalation-workflow/SKILL.md) — Out-of-bounds threshold routing, cryptographic approval tickets, and timeout handling.
-- [Adversarial Attack Simulation & Evaluation Suite](file:///c:/Users/jishn/Documents/hackathon/colosseum/AgentPay-Guard/.agents/skills/adversarial-attack-simulation/SKILL.md) — Test suites for prompt-injection wallet drains, infinite reasoning loops, and payload substitution defense demonstrations.
+- [Solana Anchor Program Development](.agents/skills/solana-anchor-development/SKILL.md) — Anchor program architecture, PDA constraints, CPI safety, and LiteSVM/Bankrun testing.
+- [Agent Wallet Security Standards](.agents/skills/agent-wallet-security/SKILL.md) — Non-custodial vault architectures, key isolation, and preventing prompt-injection key leaks.
+- [PayBind Intent Protocol Specification](.agents/skills/paybind-intent-protocol/SKILL.md) — RFC 8785 canonical serialization, BLAKE3/SHA-256 payload digest generation, and atomic delivery verification.
+- [Agent Middleware & Interceptor Architecture](.agents/skills/agent-middleware-interceptor/SKILL.md) — Tool-calling interception patterns for LangChain, ElizaOS, and Solana Agent Kit.
+- [Anomaly Sentinel & Velocity Heuristics](.agents/skills/velocity-heuristics-sentinel/SKILL.md) — Sliding-window algorithms, leaky-bucket rate limiting, recursive loop detection, and freeze triggers.
+- [Human-in-the-Loop Escalation Workflows](.agents/skills/hitl-escalation-workflow/SKILL.md) — Out-of-bounds threshold routing, cryptographic approval tickets, and timeout handling.
+- [Adversarial Attack Simulation & Evaluation Suite](.agents/skills/adversarial-attack-simulation/SKILL.md) — Test suites for prompt-injection wallet drains, infinite reasoning loops, and payload substitution defense demonstrations.

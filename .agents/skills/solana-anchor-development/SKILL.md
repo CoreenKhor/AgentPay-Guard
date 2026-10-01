@@ -28,10 +28,12 @@ This skill provides best practices, account validation patterns, and testing pro
 
 ## 2. Standard Account Patterns for AgentPay Guard
 
-### Vault Authority & Policy State
+### Vault Authority & State Accounts
 
 ```rust
 use anchor_lang::prelude::*;
+
+pub const MAX_ALLOWED_RECIPIENTS: usize = 16;
 
 #[account]
 #[derive(InitSpace)]
@@ -40,19 +42,33 @@ pub struct VaultAuthority {
     pub sentinel_key: Pubkey,
     pub bump: u8,
     pub is_frozen: bool,
-    pub daily_spend_limit_lamports: u64,
+    pub created_at: i64,
+}
+
+#[account]
+#[derive(InitSpace)]
+pub struct SpendingPolicy {
+    pub vault: Pubkey,
+    pub max_amount_per_tx: u64,
+    pub daily_budget_lamports: u64,
     pub current_daily_spent: u64,
     pub last_spend_timestamp: i64,
+    pub require_whitelist: bool,
+    #[max_len(MAX_ALLOWED_RECIPIENTS)]
+    pub allowed_recipients: Vec<Pubkey>,
+    pub bump: u8,
 }
 
 #[account]
 #[derive(InitSpace)]
 pub struct ExecutionReceipt {
+    pub vault: Pubkey,
     pub session_id: [u8; 32],
     pub payload_hash: [u8; 32],
     pub recipient: Pubkey,
     pub amount_lamports: u64,
     pub timestamp: i64,
+    pub bump: u8,
 }
 ```
 
@@ -60,17 +76,25 @@ pub struct ExecutionReceipt {
 
 ```rust
 #[derive(Accounts)]
-#[instruction(session_id: [u8; 32], payload_hash: [u8; 32], amount: u64)]
+#[instruction(session_id: [u8; 32], payload_hash: [u8; 32], amount_lamports: u64)]
 pub struct SettlePayment<'info> {
     #[account(
         mut,
-        seeds = [b"vault", vault.agent_owner.as_ref()],
+        seeds = [VaultAuthority::SEED_PREFIX, vault.agent_owner.as_ref()],
         bump = vault.bump,
         constraint = !vault.is_frozen @ GuardError::VaultFrozen,
     )]
     pub vault: Account<'info, VaultAuthority>,
 
-    /// CHECK: Recipient account verified against spending policy allowlist
+    #[account(
+        mut,
+        seeds = [SpendingPolicy::SEED_PREFIX, vault.key().as_ref()],
+        bump = policy.bump,
+        has_one = vault,
+    )]
+    pub policy: Account<'info, SpendingPolicy>,
+
+    /// CHECK: Target recipient account. Validated against whitelist if require_whitelist is enabled.
     #[account(mut)]
     pub recipient: AccountInfo<'info>,
 
@@ -78,7 +102,7 @@ pub struct SettlePayment<'info> {
         init,
         payer = payer,
         space = 8 + ExecutionReceipt::INIT_SPACE,
-        seeds = [b"receipt", vault.key().as_ref(), session_id.as_ref()],
+        seeds = [ExecutionReceipt::SEED_PREFIX, vault.key().as_ref(), session_id.as_ref()],
         bump
     )]
     pub receipt: Account<'info, ExecutionReceipt>,
@@ -97,21 +121,25 @@ pub struct SettlePayment<'info> {
 pub struct FreezeVault<'info> {
     #[account(
         mut,
-        seeds = [b"vault", vault.agent_owner.as_ref()],
+        seeds = [VaultAuthority::SEED_PREFIX, vault.agent_owner.as_ref()],
         bump = vault.bump,
-        has_one = sentinel_key @ GuardError::UnauthorizedSentinel
+        constraint = (
+            caller.key() == vault.sentinel_key || caller.key() == vault.agent_owner
+        ) @ GuardError::UnauthorizedSentinel,
     )]
     pub vault: Account<'info, VaultAuthority>,
 
-    pub sentinel_key: Signer<'info>,
+    pub caller: Signer<'info>,
 }
 
 pub fn handle_freeze_vault(ctx: Context<FreezeVault>) -> Result<()> {
     let vault = &mut ctx.accounts.vault;
     vault.is_frozen = true;
+    let clock = Clock::get()?;
     emit!(VaultFrozenEvent {
-        agent_owner: vault.agent_owner,
-        timestamp: Clock::get()?.unix_timestamp,
+        vault: vault.key(),
+        triggered_by: ctx.accounts.caller.key(),
+        timestamp: clock.unix_timestamp,
     });
     Ok(())
 }
@@ -119,22 +147,18 @@ pub fn handle_freeze_vault(ctx: Context<FreezeVault>) -> Result<()> {
 
 ---
 
-## 3. Fast Testing Workflow (LiteSVM & Bankrun)
+## 3. Testing Workflow & Node Test Runner
 
-Avoid slow local validator boot times by utilizing `solana-bankrun` or `litesvm` for microsecond-level unit tests:
+Run tests against the contract specification:
 
 ```typescript
-import { startAnchor } from "solana-bankrun";
-import { PublicKey } from "@solana/web3.js";
+import { describe, it } from "node:test";
+import assert from "node:assert/strict";
+import { PublicKey, Keypair } from "@solana/web3.js";
 
-describe("agentpay-guard settlement tests", () => {
+describe("agentpay-guard settlement and circuit breaker tests", () => {
   it("freezes vault when sentinel triggers circuit breaker", async () => {
-    const context = await startAnchor(".", [{ name: "agentpay_guard", programId }], []);
-    const client = context.banksClient;
-    
-    // Execute freeze instruction
-    // Assert vault.is_frozen === true
-    // Verify subsequent settlement CPI fails with GuardError::VaultFrozen
+    // Settle, Freeze and Unfreeze instruction tests
   });
 });
 ```
