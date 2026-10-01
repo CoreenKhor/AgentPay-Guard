@@ -50,51 +50,42 @@ The AgentPay Guard Interceptor intercepts proposed economic actions generated du
 ### TypeScript Middleware Adapter Pattern
 
 ```typescript
-import { Transaction, VersionedTransaction } from "@solana/web3.js";
+import {
+  AgentPayGuardInterceptor,
+  InterceptRequest,
+  InterceptResponse,
+} from "@agentpay-guard/agent-sdk";
+import { DeterministicPolicyEngine } from "@agentpay-guard/paybind-core";
+import { CircuitBreakerSentinel, HITLGateway } from "@agentpay-guard/anomaly-sentinel";
+import { PublicKey } from "@solana/web3.js";
 
-export interface PolicyCheckResult {
-  allowed: boolean;
-  reason?: string;
-  requiresHITL?: boolean;
-}
-
-export class AgentPayGuardInterceptor {
-  constructor(
-    private policyEngine: DeterministicPolicyEngine,
-    private sentinel: AnomalySentinelClient,
-    private vaultProgram: AgentPayGuardProgramClient
-  ) {}
+export class CustomAgentMiddleware {
+  constructor(private interceptor: AgentPayGuardInterceptor) {}
 
   /**
    * Intercepts a proposed transaction before signing
    */
-  async interceptTransaction(
+  async interceptAction(
     agentId: string,
-    proposedTx: Transaction | VersionedTransaction,
+    recipient: string,
+    amountLamports: bigint,
     metadata: { endpoint: string; servicePayload: any }
-  ): Promise<{ signature?: string; rejected: boolean; error?: string }> {
-    // 1. Analyze velocity heuristics
-    const velocityStatus = await this.sentinel.recordAndEvaluate(agentId, proposedTx);
-    if (velocityStatus.isAnomalous) {
-      await this.vaultProgram.triggerEmergencyFreeze(agentId, velocityStatus.reason);
-      return { rejected: true, error: `Circuit breaker tripped: ${velocityStatus.reason}` };
+  ): Promise<InterceptResponse> {
+    const result = await this.interceptor.interceptTransaction({
+      agentId,
+      recipient,
+      amountLamports,
+      metadata,
+    });
+
+    if (result.status === "CIRCUIT_TRIPPED") {
+      console.error(`[Security] Circuit breaker active: ${result.error}`);
+    } else if (result.status === "HITL_PENDING") {
+      console.warn(`[HITL] Escalation ticket created: ${result.approvalTicket?.ticketId}`);
     }
 
-    // 2. Validate spending policies
-    const policyResult = await this.policyEngine.evaluate(proposedTx);
-    if (!policyResult.allowed) {
-      if (policyResult.requiresHITL) {
-        return await this.routeToHITL(agentId, proposedTx, metadata);
-      }
-      return { rejected: true, error: `Policy violation: ${policyResult.reason}` };
-    }
-
-    // 3. Bind intent and execute via on-chain Financial Hub
-    const signature = await this.vaultProgram.executeSettlement(proposedTx, metadata);
-    return { signature, rejected: false };
+    return result;
   }
-
-  private async routeToHITL(...) { /* Escalation webhook */ }
 }
 ```
 

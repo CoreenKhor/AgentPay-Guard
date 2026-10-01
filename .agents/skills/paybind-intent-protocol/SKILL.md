@@ -39,22 +39,20 @@ To ensure cross-language determinism between TypeScript (SDK), Python (Agent), a
    Use BLAKE3 (or SHA-256 for native Solana compatibility):
 
 ```typescript
-import { createHash } from "crypto";
+import {
+  createPayBindManifest,
+  canonicalizeJson,
+  computeSha256Hex,
+  computeBlake3Hex,
+  PayBindManifest,
+} from "@agentpay-guard/paybind-core";
 
-export interface PayBindManifest {
-  sessionId: string;
-  providerPubkey: string;
-  resourceEndpoint: string;
-  expectedPayloadHash: string; // Hex-encoded 32-byte hash of expected schema or quote
-  maxCostLamports: number;
-  nonce: number;
-  deadlineUnix: number;
-}
-
-export function computePayBindDigest(manifest: PayBindManifest): Uint8Array {
-  // Sort keys lexicographically
-  const canonicalString = JSON.stringify(manifest, Object.keys(manifest).sort());
-  return createHash("sha256").update(canonicalString).digest();
+export function generatePayBindDigest(manifest: PayBindManifest): { sha256: string; blake3: string } {
+  const canonicalString = canonicalizeJson(manifest);
+  return {
+    sha256: computeSha256Hex(canonicalString),
+    blake3: computeBlake3Hex(canonicalString),
+  };
 }
 ```
 

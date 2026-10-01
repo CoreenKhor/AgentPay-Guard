@@ -53,21 +53,28 @@ Resume Tx execution                      Abort tool call &
 To prevent replay or tampering of human approvals, the approval payload must be signed by the registered human owner's keypair:
 
 ```typescript
+export type TicketStatus = "PENDING" | "APPROVED" | "REJECTED" | "EXPIRED";
+
 export interface HumanApprovalTicket {
   ticketId: string;
   agentId: string;
-  proposedTxHash: string; // SHA-256 of the exact transaction buffer
-  approvedAtUnix: number;
+  proposedTxHash: string; // Payload digest / transaction hash
+  amountLamports: string;
+  recipient: string;
+  reason: string;
+  createdAtUnix: number;
+  approvedAtUnix?: number;
   expiresAtUnix: number;
-  operatorPubkey: string;
-  signature: string; // Ed25519 signature over ticket fields
+  operatorPubkey?: string;
+  signature?: string; // Base58-encoded Ed25519 signature
+  status: TicketStatus;
 }
 ```
 
 The on-chain or interceptor layer validates that:
 - `ticket.expiresAtUnix > Date.now() / 1000`
-- `ticket.proposedTxHash == sha256(proposedTx)`
-- `verifySignature(ticket.operatorPubkey, ticket.signature)` matches an authorized operator.
+- `ticket.status === "APPROVED"`
+- Ticket digest `SHA-256(ticketId:agentId:recipient:amountLamports:proposedTxHash:expiresAtUnix)` verified against `operatorPubkey` and `signature` via `tweetnacl`.
 
 ---
 
