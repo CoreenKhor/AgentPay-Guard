@@ -1,0 +1,12 @@
+{
+  "name": "agentpay-guard-adversarial-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "tsx adversarial_suite.test.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}
