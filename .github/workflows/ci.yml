@@ -59,7 +59,6 @@ jobs:
           for dir in packages/*; do
             if [ -d "$dir" ] && [ -f "$dir/package.json" ]; then
               echo "===> Checking $dir <==="
-              (cd "$dir" && npm ci --ignore-scripts 2>/dev/null || npm install)
               if grep -q '"build"' "$dir/package.json"; then (cd "$dir" && npm run build); fi
               if grep -q '"test"' "$dir/package.json"; then (cd "$dir" && npm test); fi
             fi
@@ -106,12 +105,12 @@ jobs:
         with:
           node-version: 22
 
+      - name: Install Root Dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci || npm install
+          fi
+
       - name: Run Adversarial Test Suite
         run: |
-          if [ -f tests/adversarial/package.json ]; then
-            cd tests/adversarial
-            npm ci || npm install
-            npm test
-          else
-            echo "Adversarial test suite configured; ready for test definitions."
-          fi
+          npm run test:adversarial

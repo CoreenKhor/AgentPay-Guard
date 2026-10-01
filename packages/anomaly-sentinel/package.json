@@ -8,6 +8,9 @@
   "exports": {
     ".": "./src/index.ts"
   },
+  "scripts": {
+    "test": "tsx test/sentinel.test.ts"
+  },
   "keywords": [
     "solana",
     "ai-agents",

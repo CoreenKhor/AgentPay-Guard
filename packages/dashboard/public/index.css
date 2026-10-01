@@ -176,11 +176,39 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 7px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
   background: var(--bg-subtle);
   border: 1px solid var(--border);
+  overflow: hidden;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.brand-logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transform: scale(1.35);
+  display: block;
+  transition: opacity var(--transition-fast);
+}
+
+/* Dark mode: show black logo, hide white logo */
+[data-theme="dark"] .brand-logo-dark {
+  display: block;
+}
+[data-theme="dark"] .brand-logo-light {
+  display: none;
+}
+
+/* Light mode: show white logo, hide black logo */
+[data-theme="light"] .brand-logo-light {
+  display: block;
+}
+[data-theme="light"] .brand-logo-dark {
+  display: none;
 }
 
 .brand-text {

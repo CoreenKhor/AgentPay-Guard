@@ -22,13 +22,16 @@ function setTheme(theme) {
 
   const sunIcon = document.getElementById("theme-icon-sun");
   const moonIcon = document.getElementById("theme-icon-moon");
+  const favicon = document.getElementById("app-favicon");
 
   if (theme === "light") {
     sunIcon?.classList.add("hidden");
     moonIcon?.classList.remove("hidden");
+    if (favicon) favicon.href = "logo-light.png";
   } else {
     sunIcon?.classList.remove("hidden");
     moonIcon?.classList.add("hidden");
+    if (favicon) favicon.href = "logo-dark.png";
   }
 
   drawVelocityChart();

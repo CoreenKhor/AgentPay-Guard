@@ -123,40 +123,41 @@ AgentPay-Guard/
 ### Vera (`vera` branch) — Frontend: Telemetry Dashboard & HITL Escalation Lead
 *Reference Skill: [hitl-escalation-workflow](.agents/skills/hitl-escalation-workflow/SKILL.md)*
 
-- [ ] **Telemetry Dashboard Web Application (`packages/dashboard/`):**
-  - [ ] Scaffold modern dashboard UI (Vite / Next.js + CSS tokens & components).
-  - [ ] Build real-time agent activity feed and transaction visualizer.
-  - [ ] Create live velocity & acceleration metric gauges ($T_1, T_2, T_3$ visual indicators).
-  - [ ] Display active spending policies, whitelist addresses, and vault balance overviews.
-- [ ] **Security Alerts & Anomaly Inspector View:**
-  - [ ] Build blocked attack notification stream with reason codes, violation types, and payload diff views.
-  - [ ] Add one-click manual emergency freeze / unfreeze operator trigger controls.
-- [ ] **HITL Human Escalation Approval Portal:**
-  - [ ] Implement interactive approval queue for transactions exceeding standard thresholds.
-  - [ ] Render countdown timers for expiring tickets (e.g. 180s expiration window).
-  - [ ] Add one-click approve/reject actions with signature dispatching.
-- [ ] **Frontend Integration & E2E Testing:**
-  - [ ] Connect dashboard WebSocket/REST endpoints to backend Sentinel and on-chain RPC feeds.
-  - [ ] Ensure responsive layout, dark mode styling, and high-fidelity operator UX.
+- [x] **Telemetry Dashboard Web Application (`packages/dashboard/`):**
+  - [x] Scaffold modern dashboard UI (Swiss cybernetic design, light/dark theme, responsive layout).
+  - [x] Build real-time agent activity feed and transaction visualizer.
+  - [x] Create live velocity & acceleration metric gauges ($T_1, T_2, T_3$ visual indicators).
+  - [x] Display active spending policies, whitelist addresses, and vault balance overviews.
+- [x] **Security Alerts & Anomaly Inspector View:**
+  - [x] Build blocked attack notification stream with reason codes, violation types, and payload diff views.
+  - [x] Add one-click manual emergency freeze / unfreeze operator trigger controls.
+- [x] **HITL Human Escalation Approval Portal:**
+  - [x] Implement interactive approval queue for transactions exceeding standard thresholds.
+  - [x] Render countdown timers for expiring tickets (e.g. 180s expiration window).
+  - [x] Add one-click approve/reject actions with cryptographic Ed25519 signature dispatching.
+- [x] **Frontend Integration & E2E Testing:**
+  - [x] Connect dashboard SSE/REST endpoints to backend Sentinel and on-chain RPC feeds.
+  - [x] Ensure responsive layout, dark mode styling, and high-fidelity operator UX.
 
 ---
 
 ## 5. Team Milestones & Integration Points
 
-| Milestone | Target Date | Integration Dependencies | Deliverable |
-|---|---|---|---|
-| **M1: Interface Freeze** | Day 3 | Member 1, Member 2, Member 3 | Finalized instruction schemas, Borsh structures, IPC signatures |
-| **M2: Core Engines Complete** | Day 8 | Independent branches | Anchor contract compiled, PayBind hashing validated, Sentinel algorithms running |
-| **M3: End-to-End Pipeline** | Day 13 | Role 1 + Role 2 + Role 3 | Agent tool call intercepted -> Sentinel verified -> On-chain settled |
-| **M4: Attack Suite Validation** | Day 17 | All branches merged to `main` | Passing simulation of prompt injection drain and recursive loops |
-| **M5: Colosseum Submission** | Day 21 | Final release | Devnet deployment, live dashboard, 3-minute video walkthrough |
+| Milestone | Target Date | Integration Dependencies | Deliverable | Status |
+|---|---|---|---|---|
+| **M1: Interface Freeze** | Day 3 | Member 1, Member 2, Member 3 | Finalized instruction schemas, Borsh structures, IPC signatures | **Completed** |
+| **M2: Core Engines Complete** | Day 8 | Independent branches | Anchor contract compiled, PayBind hashing validated, Sentinel algorithms running | **Completed** |
+| **M3: End-to-End Pipeline** | Day 13 | Role 1 + Role 2 + Role 3 | Agent tool call intercepted -> Sentinel verified -> On-chain settled | **Completed** |
+| **M4: Attack Suite Validation** | Day 17 | All branches merged to `main` | Passing simulation of prompt injection drain and recursive loops | **Completed** |
+| **M5: Colosseum Submission** | Day 21 | Final release | Devnet deployment, live dashboard, 3-minute video walkthrough | **Ready** |
 
 ---
 
 ## 6. Shared Adversarial Test Suite (`tests/adversarial/`)
 *Reference Skill: [adversarial-attack-simulation](.agents/skills/adversarial-attack-simulation/SKILL.md)*
 
-- [ ] **ATK-01 (Prompt Injection Drain):** Agent prompted to transfer entire balance to attacker. Must be blocked by policy allowlist and circuit breaker.
-- [ ] **ATK-02 (Infinite Inference Loop):** Agent caught in repetitive tool cycle. Must be halted within 3 iterations by Anomaly Sentinel.
-- [ ] **ATK-03 (Payload Substitution):** Rogue provider returns tampered data. Must fail PayBind digest validation.
-- [ ] **ATK-04 (Receipt Replay):** Expired or replayed receipt submitted to chain. Must fail PDA collision / nonce validation.
+- [x] **ATK-01 (Prompt Injection Drain):** Agent prompted to transfer entire balance to attacker. Blocked by policy allowlist and circuit breaker.
+- [x] **ATK-02 (Infinite Inference Loop):** Agent caught in repetitive tool cycle. Halted within 3 iterations by Anomaly Sentinel LRU ring buffer.
+- [x] **ATK-03 (Payload Substitution):** Rogue provider returns tampered data. Flagged with PAYLOAD_MISMATCH by PayBind digest validation.
+- [x] **ATK-04 (Receipt Replay):** Expired or replayed receipt submitted to chain. Blocked by PDA collision / nonce validation.
+- [x] **ATK-05 (HITL Escalation):** High-value transaction routed to operator queue, authenticated with Ed25519 cryptographic signature.
