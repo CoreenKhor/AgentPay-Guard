@@ -13,12 +13,13 @@
   ],
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "npm run test:anchor && npm run test:paybind && npm run test:sentinel && npm run test:sdk && npm run test:adversarial",
+    "test": "npm run test:anchor && npm run test:paybind && npm run test:sentinel && npm run test:sdk && npm run test:adversarial && npm run test:edge-cases",
     "test:anchor": "tsx tests/anchor/agentpay_guard.spec.ts",
     "test:paybind": "tsx packages/paybind-core/test/paybind.test.ts",
     "test:sentinel": "tsx packages/anomaly-sentinel/test/sentinel.test.ts",
     "test:sdk": "tsx packages/agent-sdk/test/sdk.test.ts",
     "test:adversarial": "tsx tests/adversarial/adversarial_suite.test.ts",
+    "test:edge-cases": "tsx tests/adversarial/edge_cases_qa.test.ts",
     "start": "tsx packages/dashboard/server.js",
     "dashboard": "tsx packages/dashboard/server.js"
   },

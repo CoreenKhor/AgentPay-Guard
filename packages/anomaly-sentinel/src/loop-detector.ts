@@ -33,7 +33,7 @@ export class RecursiveLoopDetector {
     amountLamports: bigint,
     payloadDigest: string
   ): string {
-    const raw = `${recipient.toLowerCase()}:${amountLamports.toString()}:${payloadDigest.toLowerCase()}`;
+    const raw = `${recipient.trim()}:${amountLamports.toString()}:${payloadDigest.trim().toLowerCase()}`;
     return createHash("sha256").update(raw, "utf8").digest("hex");
   }
 

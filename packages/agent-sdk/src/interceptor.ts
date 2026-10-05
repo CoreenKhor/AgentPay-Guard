@@ -205,6 +205,24 @@ export class AgentPayGuardInterceptor {
       };
     }
 
+    // 6. Pre-Settlement PayBind Resource Delivery Verification (if response payload supplied)
+    if (metadata.deliveredPayload !== undefined) {
+      const deliveryCheck = verifyDeliveredPayload(manifest, metadata.deliveredPayload);
+      if (!deliveryCheck.isValid) {
+        const response: InterceptResponse = {
+          status: "PAYLOAD_MISMATCH",
+          success: false,
+          payBindManifest: manifest,
+          error: `Payload substitution attack detected! Delivered hash ${deliveryCheck.actual} != Expected ${deliveryCheck.expected}`,
+          reason: "PAYLOAD_TAMPERED",
+        };
+        if (idempotencyKey) {
+          this.idempotencyCache.set(idempotencyKey, response);
+        }
+        return response;
+      }
+    }
+
     try {
       const sessionIdBytes = Buffer.from(manifest.sessionId.padEnd(32, "0").slice(0, 32), "utf8");
 
@@ -215,22 +233,6 @@ export class AgentPayGuardInterceptor {
         sessionIdBytes: new Uint8Array(sessionIdBytes),
         payloadHashHex: payloadDigestHex,
       });
-
-      // 7. Layer 5: Post-Settlement PayBind Resource Delivery Verification (if response payload supplied)
-      if (metadata.deliveredPayload !== undefined) {
-        const deliveryCheck = verifyDeliveredPayload(manifest, metadata.deliveredPayload);
-        if (!deliveryCheck.isValid) {
-          const response: InterceptResponse = {
-            status: "PAYLOAD_MISMATCH",
-            success: false,
-            signature: settlement.txSignature,
-            receiptPubkey: settlement.receiptPubkey.toBase58(),
-            payBindManifest: manifest,
-            error: `Payload substitution attack detected! Delivered hash ${deliveryCheck.actual} != Expected ${deliveryCheck.expected}`,
-          };
-          return response;
-        }
-      }
 
       const response: InterceptResponse = {
         status: "SETTLED",

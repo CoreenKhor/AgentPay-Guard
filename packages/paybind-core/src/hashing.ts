@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { createHash, timingSafeEqual } from "node:crypto";
 import { blake3 } from "@noble/hashes/blake3";
 import { bytesToHex } from "@noble/hashes/utils";
 import { canonicalizeJson } from "./canonicalize.js";
@@ -41,18 +41,36 @@ export function computeBlake3Hex(payload: unknown): string {
 
 /**
  * Verifies that a delivered service payload matches an expected SHA-256 digest.
+ * Employs constant-time timingSafeEqual comparison to eliminate timing side-channel leaks.
  */
 export function verifySha256Match(payload: unknown, expectedHex: string): boolean {
-  const computedHex = computeSha256Hex(payload);
-  return computedHex.toLowerCase() === expectedHex.toLowerCase();
+  try {
+    const computedDigest = computeSha256Digest(payload);
+    const expectedBuffer = Buffer.from(expectedHex.trim(), "hex");
+    if (computedDigest.length !== expectedBuffer.length) {
+      return false;
+    }
+    return timingSafeEqual(Buffer.from(computedDigest), expectedBuffer);
+  } catch {
+    return false;
+  }
 }
 
 /**
  * Verifies that a delivered service payload matches an expected BLAKE3 digest.
+ * Employs constant-time timingSafeEqual comparison to eliminate timing side-channel leaks.
  */
 export function verifyBlake3Match(payload: unknown, expectedHex: string): boolean {
-  const computedHex = computeBlake3Hex(payload);
-  return computedHex.toLowerCase() === expectedHex.toLowerCase();
+  try {
+    const computedDigest = computeBlake3Digest(payload);
+    const expectedBuffer = Buffer.from(expectedHex.trim(), "hex");
+    if (computedDigest.length !== expectedBuffer.length) {
+      return false;
+    }
+    return timingSafeEqual(Buffer.from(computedDigest), expectedBuffer);
+  } catch {
+    return false;
+  }
 }
 
 /**

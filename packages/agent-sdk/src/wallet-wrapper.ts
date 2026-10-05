@@ -12,6 +12,7 @@ import { AgentPayGuardInterceptor, InterceptResponse } from "./interceptor.js";
 
 export interface TransactionInspection {
   recipient: string;
+  recipients?: string[];
   amountLamports: bigint;
   endpoint: string;
   payload: Record<string, unknown>;
@@ -24,7 +25,7 @@ export function inspectSolanaTransaction(
   tx: Transaction | VersionedTransaction,
   defaultEndpoint: string = "/solana/tx"
 ): TransactionInspection {
-  let recipient = "";
+  const recipients: string[] = [];
   let amountLamports = 0n;
 
   if ("instructions" in tx && Array.isArray(tx.instructions)) {
@@ -35,20 +36,25 @@ export function inspectSolanaTransaction(
           const lamports = ix.data.readBigUInt64LE(4);
           amountLamports += lamports;
           if (ix.keys.length >= 2 && ix.keys[1]) {
-            recipient = ix.keys[1].pubkey.toBase58();
+            recipients.push(ix.keys[1].pubkey.toBase58());
           }
         }
       }
     }
   }
 
+  const uniqueRecipients = Array.from(new Set(recipients));
+  const primaryRecipient = uniqueRecipients[0] || SystemProgram.programId.toBase58();
+
   return {
-    recipient: recipient || SystemProgram.programId.toBase58(),
+    recipient: primaryRecipient,
+    recipients: uniqueRecipients,
     amountLamports,
     endpoint: defaultEndpoint,
     payload: {
       instructionCount: "instructions" in tx ? tx.instructions.length : 1,
       timestamp: Date.now(),
+      allRecipients: uniqueRecipients,
     },
   };
 }
@@ -81,6 +87,20 @@ export class GuardedKeypairWallet {
     const amountLamports = metadata?.amountLamports ?? inspected.amountLamports;
     const endpoint = metadata?.endpoint || inspected.endpoint;
     const servicePayload = metadata?.payload || inspected.payload;
+
+    // Defense against multi-transfer allowlist bypass: verify all recipients
+    if (inspected.recipients && inspected.recipients.length > 1) {
+      for (const rec of inspected.recipients) {
+        if (!this.interceptor.policyEngine.isRecipientAllowed(rec)) {
+          return {
+            status: "REJECTED",
+            success: false,
+            error: `Policy violation: Multi-instruction transaction contains unapproved recipient '${rec}'`,
+            reason: "RECIPIENT_NOT_ALLOWED",
+          };
+        }
+      }
+    }
 
     return await this.interceptor.interceptTransaction({
       agentId: this.agentId,
@@ -142,6 +162,14 @@ export class GuardedConnection {
     options?: SendOptions
   ): Promise<TransactionSignature> {
     const inspected = inspectSolanaTransaction(transaction);
+
+    if (inspected.recipients && inspected.recipients.length > 1) {
+      for (const rec of inspected.recipients) {
+        if (!this.interceptor.policyEngine.isRecipientAllowed(rec)) {
+          throw new Error(`[GuardedConnection] sendTransaction blocked: Multi-instruction contains unapproved recipient '${rec}'`);
+        }
+      }
+    }
 
     const check = await this.interceptor.interceptTransaction({
       agentId: this.agentId,

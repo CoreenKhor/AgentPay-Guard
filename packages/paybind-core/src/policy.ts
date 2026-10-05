@@ -61,22 +61,22 @@ export class DeterministicPolicyEngine {
 
   public addAllowedRecipient(recipient: string): void {
     const normalized = recipient.trim();
-    if (!this.config.allowedRecipients.some((r) => r.toLowerCase() === normalized.toLowerCase())) {
+    if (!this.config.allowedRecipients.some((r) => r.trim() === normalized)) {
       this.config.allowedRecipients.push(normalized);
     }
   }
 
   public removeAllowedRecipient(recipient: string): void {
-    const normalized = recipient.trim().toLowerCase();
+    const normalized = recipient.trim();
     this.config.allowedRecipients = this.config.allowedRecipients.filter(
-      (r) => r.toLowerCase() !== normalized
+      (r) => r.trim() !== normalized
     );
   }
 
   public isRecipientAllowed(recipient: string): boolean {
     if (!this.config.requireAllowlist) return true;
-    const normalized = recipient.trim().toLowerCase();
-    return this.config.allowedRecipients.some((r) => r.toLowerCase() === normalized);
+    const normalized = recipient.trim();
+    return this.config.allowedRecipients.some((r) => r.trim() === normalized);
   }
 
   /**

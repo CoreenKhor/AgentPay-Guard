@@ -35,7 +35,12 @@ pub struct SettlePayment<'info> {
     )]
     pub receipt: Account<'info, ExecutionReceipt>,
 
-    #[account(mut)]
+    #[account(
+        mut,
+        constraint = (
+            payer.key() == vault.agent_owner || payer.key() == vault.sentinel_key
+        ) @ GuardError::UnauthorizedOwner,
+    )]
     pub payer: Signer<'info>,
 
     pub system_program: Program<'info, System>,

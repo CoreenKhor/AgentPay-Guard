@@ -525,11 +525,23 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // Static File Serving
-  let filePath = path.join(PUBLIC_DIR, url.pathname === "/" ? "index.html" : url.pathname);
-  if (!fs.existsSync(filePath)) {
-    filePath = path.join(PUBLIC_DIR, "index.html");
+  // Static File Serving with Path Traversal Protection
+  const rawPath = decodeURIComponent(url.pathname);
+  const normalizedRelPath = path.normalize(rawPath).replace(/^(\.\.[\/\\])+/, "");
+  let targetPath = path.resolve(PUBLIC_DIR, normalizedRelPath === "/" || normalizedRelPath === "\\" ? "index.html" : "." + path.sep + normalizedRelPath);
+
+  // Path Traversal Guard: verify resolved path is within PUBLIC_DIR
+  if (!targetPath.startsWith(path.resolve(PUBLIC_DIR))) {
+    res.writeHead(403, { "Content-Type": "text/plain" });
+    res.end("Access Denied: Path Traversal Intercepted");
+    return;
   }
+
+  if (!fs.existsSync(targetPath) || fs.statSync(targetPath).isDirectory()) {
+    targetPath = path.join(PUBLIC_DIR, "index.html");
+  }
+
+  const filePath = targetPath;
 
   const ext = path.extname(filePath);
   const contentTypes = {

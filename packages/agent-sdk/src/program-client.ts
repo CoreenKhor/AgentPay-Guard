@@ -217,6 +217,7 @@ export class AgentPayGuardProgramClient {
     const now = Math.floor(Date.now() / 1000);
     if (now - vault.lastSpendTimestamp >= 86400) {
       vault.currentDailySpent = 0n;
+      vault.lastSpendTimestamp = now;
     }
 
     if (vault.currentDailySpent + params.amountLamports > vault.dailySpendLimitLamports) {
@@ -233,7 +234,6 @@ export class AgentPayGuardProgramClient {
     vault.currentDailySpent += params.amountLamports;
     vault.totalDisbursedLamports += params.amountLamports;
     vault.totalSettledTxs += 1;
-    vault.lastSpendTimestamp = now;
 
     const receiptData: ExecutionReceiptData = {
       sessionId: Buffer.from(params.sessionIdBytes).toString("hex"),

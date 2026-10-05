@@ -31,6 +31,7 @@ export interface CreateTicketParams {
 export class HITLGateway {
   private tickets: Map<string, HumanApprovalTicket> = new Map();
   private listeners: Array<(ticket: HumanApprovalTicket) => void> = [];
+  private readonly maxCapacity: number = 500;
 
   constructor(private authorizedOperators: string[] = []) {}
 
@@ -63,9 +64,26 @@ export class HITLGateway {
   }
 
   /**
-   * Creates an ephemeral escalation ticket.
+   * Creates an ephemeral escalation ticket with bounded in-memory eviction.
    */
   public createTicket(params: CreateTicketParams): HumanApprovalTicket {
+    // Evict oldest resolved/expired ticket if capacity limit is reached
+    if (this.tickets.size >= this.maxCapacity) {
+      let evictedId: string | undefined;
+      for (const [id, t] of this.tickets.entries()) {
+        if (t.status !== "PENDING") {
+          evictedId = id;
+          break;
+        }
+      }
+      if (!evictedId) {
+        evictedId = this.tickets.keys().next().value;
+      }
+      if (evictedId) {
+        this.tickets.delete(evictedId);
+      }
+    }
+
     const ticketId = randomUUID();
     const now = Math.floor(Date.now() / 1000);
     const ttl = params.ttlSeconds ?? 180; // 180 seconds default expiry
