@@ -62,7 +62,11 @@
 
         <!-- Emergency Circuit Freeze Toggle -->
         <button id="btn-toggle-circuit" class="btn btn-freeze" onclick="toggleCircuitBreaker()">
-          <span class="btn-freeze-icon">⚠</span>
+          <span class="btn-freeze-icon">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            </svg>
+          </span>
           <span id="btn-toggle-text">Emergency Freeze</span>
         </button>
 
@@ -566,7 +570,7 @@
                 <span class="audit-step-title">PayBind Intent Protocol</span>
                 <span class="audit-step-desc font-mono" id="audit-l1-desc">Hash Digest Binding</span>
               </div>
-              <span class="audit-step-icon font-mono" id="audit-l1-icon">✓</span>
+              <span class="audit-step-icon font-mono" id="audit-l1-icon">[PASS]</span>
             </div>
 
             <div class="audit-step" id="audit-step-l2">
@@ -575,7 +579,7 @@
                 <span class="audit-step-title">Anomaly Sentinel</span>
                 <span class="audit-step-desc font-mono" id="audit-l2-desc">Velocity & Loop Guard</span>
               </div>
-              <span class="audit-step-icon font-mono" id="audit-l2-icon">✓</span>
+              <span class="audit-step-icon font-mono" id="audit-l2-icon">[PASS]</span>
             </div>
 
             <div class="audit-step" id="audit-step-l3">
@@ -584,7 +588,7 @@
                 <span class="audit-step-title">Deterministic Policy</span>
                 <span class="audit-step-desc font-mono" id="audit-l3-desc">Allowlist & Ceilings</span>
               </div>
-              <span class="audit-step-icon font-mono" id="audit-l3-icon">✓</span>
+              <span class="audit-step-icon font-mono" id="audit-l3-icon">[PASS]</span>
             </div>
 
             <div class="audit-step" id="audit-step-l4">
@@ -593,7 +597,7 @@
                 <span class="audit-step-title">Solana Financial Hub</span>
                 <span class="audit-step-desc font-mono" id="audit-l4-desc">Anchor PDA Settlement</span>
               </div>
-              <span class="audit-step-icon font-mono" id="audit-l4-icon">✓</span>
+              <span class="audit-step-icon font-mono" id="audit-l4-icon">[PASS]</span>
             </div>
           </div>
         </div>

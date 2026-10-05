@@ -442,7 +442,7 @@ function renderVaultAndPolicies() {
     const pill = document.createElement("div");
     pill.className = "allowlist-pill font-mono";
     pill.innerHTML = `
-      <span class="pill-check">✓</span>
+      <span class="pill-check">[OK]</span>
       <span class="text-main">${item.label}</span>
       <span class="text-subtle">(${item.pubkey.slice(0, 4)}...${item.pubkey.slice(-4)})</span>
     `;
@@ -481,6 +481,7 @@ function renderTransactions() {
     tr.onclick = () => openInspector(tx.id);
 
     if (tx._isNew) {
+      tr.classList.add("row-entry-anim");
       if (tx.status === "SETTLED") tr.classList.add("row-flash-green");
       else if (tx.status === "HITL_PENDING") tr.classList.add("row-flash-amber");
       else tr.classList.add("row-flash-red");
@@ -489,17 +490,17 @@ function renderTransactions() {
 
     let statusPill = "";
     if (tx.status === "SETTLED") {
-      statusPill = '<span class="status-pill pill-settled"><span class="pill-dot"></span>Settled</span>';
+      statusPill = '<span class="status-pill pill-settled"><span class="pill-dot"></span>[SETTLED]</span>';
     } else if (tx.status === "REJECTED") {
-      statusPill = '<span class="status-pill pill-blocked"><span class="pill-dot"></span>Blocked</span>';
+      statusPill = '<span class="status-pill pill-blocked"><span class="pill-dot"></span>[BLOCKED]</span>';
     } else if (tx.status === "HITL_PENDING") {
-      statusPill = '<span class="status-pill pill-review"><span class="pill-dot"></span>Review</span>';
+      statusPill = '<span class="status-pill pill-review"><span class="pill-dot"></span>[REVIEW]</span>';
     } else if (tx.status === "CIRCUIT_TRIPPED") {
-      statusPill = '<span class="status-pill pill-blocked"><span class="pill-dot"></span>Frozen</span>';
+      statusPill = '<span class="status-pill pill-blocked"><span class="pill-dot"></span>[FROZEN]</span>';
     } else if (tx.status === "PAYLOAD_MISMATCH") {
-      statusPill = '<span class="status-pill pill-review"><span class="pill-dot"></span>Mismatch</span>';
+      statusPill = '<span class="status-pill pill-review"><span class="pill-dot"></span>[MISMATCH]</span>';
     } else {
-      statusPill = `<span class="status-pill">${tx.status}</span>`;
+      statusPill = `<span class="status-pill">[${tx.status}]</span>`;
     }
 
     let vectorBadge = "";
@@ -561,13 +562,13 @@ function renderOverviewTransactions() {
 
     let statusPill = "";
     if (tx.status === "SETTLED") {
-      statusPill = '<span class="status-pill pill-settled"><span class="pill-dot"></span>Settled</span>';
+      statusPill = '<span class="status-pill pill-settled"><span class="pill-dot"></span>[SETTLED]</span>';
     } else if (tx.status === "REJECTED" || tx.status === "CIRCUIT_TRIPPED") {
-      statusPill = '<span class="status-pill pill-blocked"><span class="pill-dot"></span>Blocked</span>';
+      statusPill = '<span class="status-pill pill-blocked"><span class="pill-dot"></span>[BLOCKED]</span>';
     } else if (tx.status === "HITL_PENDING") {
-      statusPill = '<span class="status-pill pill-review"><span class="pill-dot"></span>Review</span>';
+      statusPill = '<span class="status-pill pill-review"><span class="pill-dot"></span>[REVIEW]</span>';
     } else {
-      statusPill = `<span class="status-pill">${tx.status}</span>`;
+      statusPill = `<span class="status-pill">[${tx.status}]</span>`;
     }
 
     const timeStr = new Date(tx.timestamp).toLocaleTimeString();
@@ -592,24 +593,48 @@ function drawVelocityChart() {
   const canvas = document.getElementById("velocity-chart");
   if (!canvas || activeTab !== "overview") return;
 
+  const parent = canvas.parentElement;
+  const dpr = window.devicePixelRatio || 1;
+  const displayWidth = parent ? Math.max(260, parent.clientWidth - 28) : 760;
+  const displayHeight = 175;
+
+  const targetW = Math.floor(displayWidth * dpr);
+  const targetH = Math.floor(displayHeight * dpr);
+
+  if (canvas.width !== targetW || canvas.height !== targetH) {
+    canvas.width = targetW;
+    canvas.height = targetH;
+  }
+  canvas.style.width = `${displayWidth}px`;
+  canvas.style.height = `${displayHeight}px`;
+
   const ctx = canvas.getContext("2d");
-  const width = canvas.width;
-  const height = canvas.height;
+  ctx.save();
+  ctx.scale(dpr, dpr);
+
+  const width = displayWidth;
+  const height = displayHeight;
 
   ctx.clearRect(0, 0, width, height);
 
   const isLight = document.documentElement.getAttribute("data-theme") === "light";
-  const gridColor = isLight ? "rgba(0, 0, 0, 0.05)" : "rgba(255, 255, 255, 0.04)";
+  const gridColor = isLight ? "rgba(0, 0, 0, 0.04)" : "rgba(255, 255, 255, 0.035)";
   const emeraldColor = isLight ? "#059669" : "#10B981";
-  const slateLineColor = isLight ? "rgba(100, 116, 139, 0.6)" : "rgba(148, 163, 184, 0.4)";
+  const slateLineColor = isLight ? "rgba(100, 116, 139, 0.5)" : "rgba(148, 163, 184, 0.35)";
 
-  // Grid Lines
+  // Millimeter Technical Grid Lines
   ctx.strokeStyle = gridColor;
   ctx.lineWidth = 1;
-  for (let y = 30; y < height; y += 35) {
+  for (let y = 25; y < height; y += 30) {
     ctx.beginPath();
     ctx.moveTo(0, y);
     ctx.lineTo(width, y);
+    ctx.stroke();
+  }
+  for (let x = 30; x < width; x += 45) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, height);
     ctx.stroke();
   }
 
@@ -619,14 +644,14 @@ function drawVelocityChart() {
 
   // Gradient under Outflow Curve
   const gradEmerald = ctx.createLinearGradient(0, 0, 0, height);
-  gradEmerald.addColorStop(0, isLight ? "rgba(5, 150, 105, 0.18)" : "rgba(16, 185, 129, 0.18)");
+  gradEmerald.addColorStop(0, isLight ? "rgba(5, 150, 105, 0.16)" : "rgba(16, 185, 129, 0.16)");
   gradEmerald.addColorStop(1, "rgba(16, 185, 129, 0.0)");
 
   ctx.beginPath();
   ctx.moveTo(0, height);
   for (let i = 0; i < CHART_POINTS; i++) {
     const x = i * stepX;
-    const y = height - (chartOutflowData[i] / maxVal) * (height - 40) - 20;
+    const y = height - (chartOutflowData[i] / maxVal) * (height - 40) - 15;
     ctx.lineTo(x, y);
   }
   ctx.lineTo(width, height);
@@ -634,31 +659,42 @@ function drawVelocityChart() {
   ctx.fillStyle = gradEmerald;
   ctx.fill();
 
-  // Outflow Line
+  // Outflow Primary Line
   ctx.beginPath();
   ctx.strokeStyle = emeraldColor;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.75;
+  let headX = 0, headY = 0;
   for (let i = 0; i < CHART_POINTS; i++) {
     const x = i * stepX;
-    const y = height - (chartOutflowData[i] / maxVal) * (height - 40) - 20;
+    const y = height - (chartOutflowData[i] / maxVal) * (height - 40) - 15;
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
+    headX = x;
+    headY = y;
   }
   ctx.stroke();
 
-  // Draw Velocity Frequency Line (Slate)
+  // Real-time Waveform Head Dot
+  ctx.beginPath();
+  ctx.arc(headX, headY, 2.5, 0, Math.PI * 2);
+  ctx.fillStyle = emeraldColor;
+  ctx.fill();
+
+  // Draw Velocity Frequency Line (Slate Dashed)
   ctx.beginPath();
   ctx.strokeStyle = slateLineColor;
-  ctx.lineWidth = 1.5;
-  ctx.setLineDash([3, 3]);
+  ctx.lineWidth = 1.25;
+  ctx.setLineDash([2, 3]);
   for (let i = 0; i < CHART_POINTS; i++) {
     const x = i * stepX;
-    const y = height - (chartVelocityData[i] / 4) * (height - 50) - 15;
+    const y = height - (chartVelocityData[i] / 4) * (height - 50) - 12;
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
   }
   ctx.stroke();
   ctx.setLineDash([]);
+
+  ctx.restore();
 }
 
 // Push periodic simulated jitter to chart if idle
@@ -695,7 +731,12 @@ function renderHITLQueue() {
   if (pendingTickets.length === 0) {
     container.innerHTML = `
       <div class="empty-tray">
-        <div class="empty-icon-wrap">⚡</div>
+        <div class="empty-icon-wrap">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <polyline points="9 12 11 14 15 10"/>
+          </svg>
+        </div>
         <p class="empty-title">Approval Queue is Clear</p>
         <p class="empty-desc">
           AgentPay Guard allows autonomous transactions up to <strong>0.050 SOL</strong>.
@@ -703,12 +744,12 @@ function renderHITLQueue() {
         </p>
         ${isFrozen ? `
           <div class="hitl-frozen-alert">
-            <span>⚠ Vault is currently frozen by Sentinel.</span>
+            <span>[FROZEN] Vault PDA is frozen by Sentinel.</span>
             <button class="btn-reset-micro" onclick="resetCircuitBreaker()">Reset Circuit</button>
           </div>
         ` : `
           <button class="btn-trigger-hitl" onclick="triggerSimulation('HITL_TRIGGER')">
-            ⚡ Trigger Test Escalation (0.085 SOL)
+            Trigger Test Escalation (0.085 SOL)
           </button>
         `}
       </div>
@@ -859,84 +900,84 @@ function openInspector(txId) {
   if (tx.status === "PAYLOAD_MISMATCH") {
     l1Step.className = "audit-step fail";
     l1Desc.textContent = "Hash Mismatch: Response payload tampered by provider";
-    l1Icon.textContent = "✕";
+    l1Icon.textContent = "[FAIL]";
 
     l2Step.className = "audit-step pass";
     l2Desc.textContent = "Velocity parameters nominal";
-    l2Icon.textContent = "✓";
+    l2Icon.textContent = "[PASS]";
 
     l3Step.className = "audit-step pass";
     l3Desc.textContent = "Recipient and limit passed";
-    l3Icon.textContent = "✓";
+    l3Icon.textContent = "[PASS]";
 
     l4Step.className = "audit-step fail";
     l4Desc.textContent = "Settlement aborted to prevent poisoning";
-    l4Icon.textContent = "✕";
+    l4Icon.textContent = "[FAIL]";
   } else if (tx.status === "CIRCUIT_TRIPPED") {
     l1Step.className = "audit-step pass";
     l1Desc.textContent = "Intent bound to schema";
-    l1Icon.textContent = "✓";
+    l1Icon.textContent = "[PASS]";
 
     l2Step.className = "audit-step fail";
     l2Desc.textContent = tx.notes || "Recursive loop detected or velocity breached";
-    l2Icon.textContent = "✕";
+    l2Icon.textContent = "[FAIL]";
 
     l3Step.className = "audit-step fail";
     l3Desc.textContent = "Execution halted by Sentinel";
-    l3Icon.textContent = "✕";
+    l3Icon.textContent = "[FAIL]";
 
     l4Step.className = "audit-step fail";
     l4Desc.textContent = "Vault PDA Frozen on Solana";
-    l4Icon.textContent = "✕";
+    l4Icon.textContent = "[FAIL]";
   } else if (tx.status === "REJECTED") {
     l1Step.className = "audit-step pass";
     l1Desc.textContent = "Intent bound";
-    l1Icon.textContent = "✓";
+    l1Icon.textContent = "[PASS]";
 
     l2Step.className = "audit-step pass";
     l2Desc.textContent = "Velocity nominal";
-    l2Icon.textContent = "✓";
+    l2Icon.textContent = "[PASS]";
 
     l3Step.className = "audit-step fail";
     l3Desc.textContent = tx.notes || "Policy violation: Recipient not allowed or cap exceeded";
-    l3Icon.textContent = "✕";
+    l3Icon.textContent = "[FAIL]";
 
     l4Step.className = "audit-step fail";
     l4Desc.textContent = "Settlement blocked";
-    l4Icon.textContent = "✕";
+    l4Icon.textContent = "[FAIL]";
   } else if (tx.status === "HITL_PENDING") {
     l1Step.className = "audit-step pass";
     l1Desc.textContent = "Intent bound";
-    l1Icon.textContent = "✓";
+    l1Icon.textContent = "[PASS]";
 
     l2Step.className = "audit-step pass";
     l2Desc.textContent = "Velocity normal";
-    l2Icon.textContent = "✓";
+    l2Icon.textContent = "[PASS]";
 
     l3Step.className = "audit-step warn";
     l3Desc.textContent = "Exceeds autonomous limit. Escalated to HITL queue.";
-    l3Icon.textContent = "!";
+    l3Icon.textContent = "[WARN]";
 
     l4Step.className = "audit-step warn";
     l4Desc.textContent = "Awaiting operator Ed25519 authorization signature";
-    l4Icon.textContent = "⏳";
+    l4Icon.textContent = "[WAIT]";
   } else {
     // Settled
     l1Step.className = "audit-step pass";
     l1Desc.textContent = "RFC 8785 SHA-256 Digest Verified";
-    l1Icon.textContent = "✓";
+    l1Icon.textContent = "[PASS]";
 
     l2Step.className = "audit-step pass";
     l2Desc.textContent = "Velocity & Loop Limits Clear";
-    l2Icon.textContent = "✓";
+    l2Icon.textContent = "[PASS]";
 
     l3Step.className = "audit-step pass";
     l3Desc.textContent = "Allowlist & Spending Ceilings Approved";
-    l3Icon.textContent = "✓";
+    l3Icon.textContent = "[PASS]";
 
     l4Step.className = "audit-step pass";
     l4Desc.textContent = "Settled via Vault PDA & ExecutionReceipt Logged";
-    l4Icon.textContent = "✓";
+    l4Icon.textContent = "[PASS]";
   }
 
   // Parameters
@@ -1132,4 +1173,15 @@ window.addEventListener("DOMContentLoaded", () => {
   renderLogs();
   fetchState();
   connectSSE();
+});
+
+// Dynamic responsive chart redraw on window resize
+let resizeTimer = null;
+window.addEventListener("resize", () => {
+  if (resizeTimer) clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (activeTab === "overview") {
+      drawVelocityChart();
+    }
+  }, 100);
 });
