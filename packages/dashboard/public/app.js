@@ -757,7 +757,20 @@ function renderHITLQueue() {
     return;
   }
 
-  container.innerHTML = "";
+  // Reconcile cards by ticketId to prevent DOM destruction and animation flash every second
+  const existingCards = new Map();
+  container.querySelectorAll(".ticket-card[data-ticket-id]").forEach((el) => {
+    existingCards.set(el.dataset.ticketId, el);
+  });
+
+  const pendingIds = new Set(pendingTickets.map((t) => t.ticketId));
+
+  // Remove cards that are no longer pending
+  existingCards.forEach((el, id) => {
+    if (!pendingIds.has(id)) {
+      el.remove();
+    }
+  });
 
   for (const ticket of pendingTickets) {
     const now = Math.floor(Date.now() / 1000);
@@ -765,33 +778,65 @@ function renderHITLQueue() {
     const isUrgent = remainingSec > 0 && remainingSec <= 30;
     const progressPct = Math.min(100, Math.max(0, (remainingSec / 180) * 100));
 
-    const card = document.createElement("div");
-    card.className = "ticket-card";
-    card.innerHTML = `
-      <div class="ticket-card-top font-mono">
-        <span class="ticket-amount text-emerald">${formatSol(ticket.amountLamports)} SOL</span>
-        <span class="ticket-timer ${isUrgent ? 'urgent' : ''}">
-          ${remainingSec > 0 ? `Expires in ${remainingSec}s` : 'EXPIRED'}
-        </span>
-      </div>
-      <div class="progress-track" style="height: 3px; margin: 4px 0 6px 0;">
-        <div class="progress-fill fill-emerald" style="width: ${progressPct}%;"></div>
-      </div>
-      <div class="ticket-meta">
-        <div>Agent: <span class="text-main font-mono">${ticket.agentId}</span></div>
-        <div>Reason: ${ticket.reason}</div>
-        <div>Recipient: <code class="font-mono text-muted">${ticket.recipient.slice(0, 16)}...</code></div>
-      </div>
-      <div class="ticket-buttons">
-        <button class="btn-approve" ${remainingSec <= 0 ? 'disabled style="opacity:0.4;cursor:not-allowed"' : ''} onclick="approveTicket('${ticket.ticketId}')">
-          Approve (Ed25519)
-        </button>
-        <button class="btn-reject" onclick="rejectTicket('${ticket.ticketId}')">
-          Reject
-        </button>
-      </div>
-    `;
-    container.appendChild(card);
+    let card = existingCards.get(ticket.ticketId);
+
+    if (card) {
+      // Update timer and progress bar in-place without triggering CSS enter animation or DOM flash
+      const timerEl = card.querySelector(".ticket-timer");
+      if (timerEl) {
+        timerEl.textContent = remainingSec > 0 ? `Expires in ${remainingSec}s` : "EXPIRED";
+        timerEl.className = `ticket-timer ${isUrgent ? "urgent" : ""}`;
+      }
+      const progressFill = card.querySelector(".progress-fill");
+      if (progressFill) {
+        progressFill.style.width = `${progressPct}%`;
+      }
+      const approveBtn = card.querySelector(".btn-approve");
+      if (approveBtn) {
+        if (remainingSec <= 0) {
+          approveBtn.disabled = true;
+          approveBtn.style.opacity = "0.4";
+          approveBtn.style.cursor = "not-allowed";
+        } else {
+          approveBtn.disabled = false;
+          approveBtn.style.opacity = "";
+          approveBtn.style.cursor = "";
+        }
+      }
+    } else {
+      // Create new card on first appearance
+      card = document.createElement("div");
+      card.className = "ticket-card";
+      card.dataset.ticketId = ticket.ticketId;
+      card.innerHTML = `
+        <div class="ticket-card-top font-mono">
+          <span class="ticket-amount text-emerald">${formatSol(ticket.amountLamports)} SOL</span>
+          <span class="ticket-timer ${isUrgent ? 'urgent' : ''}">
+            ${remainingSec > 0 ? `Expires in ${remainingSec}s` : 'EXPIRED'}
+          </span>
+        </div>
+        <div class="progress-track" style="height: 3px; margin: 4px 0 6px 0;">
+          <div class="progress-fill fill-emerald" style="width: ${progressPct}%;"></div>
+        </div>
+        <div class="ticket-meta">
+          <div>Agent: <span class="text-main font-mono">${ticket.agentId}</span></div>
+          <div>Reason: ${ticket.reason}</div>
+          <div>Recipient: <code class="font-mono text-muted">${ticket.recipient.slice(0, 16)}...</code></div>
+        </div>
+        <div class="ticket-buttons">
+          <button class="btn-approve" ${remainingSec <= 0 ? 'disabled style="opacity:0.4;cursor:not-allowed"' : ''} onclick="approveTicket('${ticket.ticketId}')">
+            Approve (Ed25519)
+          </button>
+          <button class="btn-reject" onclick="rejectTicket('${ticket.ticketId}')">
+            Reject
+          </button>
+        </div>
+      `;
+      // If there was an empty-tray, clear it before appending
+      const emptyTray = container.querySelector(".empty-tray");
+      if (emptyTray) emptyTray.remove();
+      container.appendChild(card);
+    }
   }
 }
 
